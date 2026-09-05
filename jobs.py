@@ -40,21 +40,26 @@ def init_db() -> None:
                 message          TEXT,
                 error            TEXT,
                 duration_seconds REAL,
+                progress         REAL DEFAULT 0,
                 created_at       REAL,
                 started_at       REAL,
                 finished_at      REAL
             )
             """
         )
+        # Migrate older DBs that pre-date the progress column.
+        cols = {row[1] for row in conn.execute("PRAGMA table_info(jobs)")}
+        if "progress" not in cols:
+            conn.execute("ALTER TABLE jobs ADD COLUMN progress REAL DEFAULT 0")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);")
 
 
 def create_job(job_id: str, params: dict, output_name: str) -> None:
     with _connect() as conn:
         conn.execute(
-            "INSERT INTO jobs (id, status, params_json, output_name, message, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (job_id, QUEUED, json.dumps(params), output_name, "Queued", time.time()),
+            "INSERT INTO jobs (id, status, params_json, output_name, message, progress, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (job_id, QUEUED, json.dumps(params), output_name, "Queued", 0.0, time.time()),
         )
 
 
@@ -78,8 +83,8 @@ def claim_next_job() -> dict | None:
             conn.execute("COMMIT")
             return None
         conn.execute(
-            "UPDATE jobs SET status = ?, started_at = ?, message = ? WHERE id = ?",
-            (PROCESSING, time.time(), "Processing", row["id"]),
+            "UPDATE jobs SET status = ?, started_at = ?, message = ?, progress = ? WHERE id = ?",
+            (PROCESSING, time.time(), "Processing", 0.0, row["id"]),
         )
         conn.execute("COMMIT")
         return dict(row)
@@ -95,11 +100,27 @@ def set_message(job_id: str, message: str) -> None:
         conn.execute("UPDATE jobs SET message = ? WHERE id = ?", (message, job_id))
 
 
+def set_progress(job_id: str, progress: float, message: str | None = None) -> None:
+    """Update render progress (0–100). Message is optional."""
+    pct = max(0.0, min(100.0, float(progress)))
+    with _connect() as conn:
+        if message is not None:
+            conn.execute(
+                "UPDATE jobs SET progress = ?, message = ? WHERE id = ?",
+                (pct, message, job_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE jobs SET progress = ? WHERE id = ?",
+                (pct, job_id),
+            )
+
+
 def mark_done(job_id: str, duration_seconds: float | None, message: str) -> None:
     with _connect() as conn:
         conn.execute(
             "UPDATE jobs SET status = ?, duration_seconds = ?, message = ?, "
-            "error = NULL, finished_at = ? WHERE id = ?",
+            "error = NULL, progress = 100, finished_at = ? WHERE id = ?",
             (DONE, duration_seconds, message, time.time(), job_id),
         )
 

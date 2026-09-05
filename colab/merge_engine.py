@@ -6,6 +6,7 @@ import math
 import re
 import shutil
 import subprocess
+import time
 import uuid
 from pathlib import Path
 
@@ -37,6 +38,216 @@ AUDIO_CROSSFADE_RATIO = 0.12
 OUTPUT_END_FADE = 0.75
 MAX_ACROSSFADE_COPIES = 36
 
+# --- Export presets: Quality vs Speed ----------------------------------------
+# The worker renders one job at a time, so a module-level profile configured at
+# the start of run_merge is safe. "high" reproduces the historical defaults
+# (visually lossless CRF 18, medium preset); "draft" trades quality for speed.
+QUALITY_PROFILES = {
+    "draft": ("veryfast", "26"),
+    "balanced": ("medium", "20"),
+    "high": ("medium", "18"),
+}
+_ENCODE_PRESET = "medium"
+_ENCODE_CRF = "18"
+
+# --- Export presets: resolution + fps ----------------------------------------
+RESOLUTION_HEIGHTS = {"720": 720, "1080": 1080, "1440": 1440, "2160": 2160, "4k": 2160}
+ALLOWED_FPS = {24, 25, 30, 48, 50, 60}
+
+# --- Export presets: aspect ratio + fit --------------------------------------
+# Values map to (width_units, height_units). When an aspect is chosen the output
+# is reframed to a fixed box; "original" leaves the source aspect untouched.
+ASPECT_RATIOS = {"16:9": (16, 9), "9:16": (9, 16), "1:1": (1, 1)}
+ALLOWED_FITS = {"letterbox", "crop"}
+# When aspect is set but no resolution is chosen, use this as the short side.
+DEFAULT_ASPECT_SHORT = 1080
+
+# --- Live progress reporting -------------------------------------------------
+# Optional callback(pct: float 0–100, message: str). Set by the worker for the
+# duration of a run_merge call. Phase lo/hi map each ffmpeg encode into a
+# slice of the overall bar so multi-step jobs still feel continuous.
+_progress_cb = None
+_phase_lo = 0.0
+_phase_hi = 100.0
+
+
+def set_progress_reporter(callback) -> None:
+    """Install/clear a progress callback: ``callback(pct: float, message: str)``."""
+    global _progress_cb
+    _progress_cb = callback
+
+
+def set_progress_phase(lo: float, hi: float, message: str | None = None) -> None:
+    global _phase_lo, _phase_hi
+    _phase_lo = max(0.0, min(100.0, lo))
+    _phase_hi = max(_phase_lo, min(100.0, hi))
+    if message is not None:
+        report_progress(_phase_lo, message)
+
+
+def report_progress(pct: float, message: str = "") -> None:
+    if _progress_cb is None:
+        return
+    try:
+        _progress_cb(max(0.0, min(100.0, float(pct))), message or "")
+    except Exception:
+        pass
+
+
+def _emit_phase_progress(local_pct: float, message: str = "") -> None:
+    """Map 0–100 within the current phase to overall progress."""
+    overall = _phase_lo + (_phase_hi - _phase_lo) * max(0.0, min(100.0, local_pct)) / 100.0
+    report_progress(overall, message)
+
+
+def _extract_dash_t(args: list[str]) -> float | None:
+    """Pull the first ``-t <seconds>`` value from an ffmpeg arg list."""
+    for i, token in enumerate(args):
+        if token == "-t" and i + 1 < len(args):
+            try:
+                return float(args[i + 1])
+            except ValueError:
+                return None
+    return None
+
+
+def set_quality(quality: str | None) -> None:
+    """Configure the libx264 preset/CRF used by every re-encode this run."""
+    global VIDEO_ENCODE, ENCODE_OPTS, _ENCODE_PRESET, _ENCODE_CRF
+    preset, crf = QUALITY_PROFILES.get(
+        (quality or "high").strip().lower(), QUALITY_PROFILES["high"]
+    )
+    _ENCODE_PRESET, _ENCODE_CRF = preset, crf
+    VIDEO_ENCODE = [
+        "-c:v", "libx264", "-preset", preset, "-crf", crf, "-pix_fmt", "yuv420p",
+    ]
+    ENCODE_OPTS = [*VIDEO_ENCODE, "-c:a", "aac", "-b:a", "256k"]
+
+
+def parse_target_height(resolution: str | int | None) -> int | None:
+    """Map a resolution choice to an output height. None = keep original."""
+    if resolution is None:
+        return None
+    key = str(resolution).strip().lower().replace("p", "")
+    if not key or key in {"original", "source", "auto"}:
+        return None
+    return RESOLUTION_HEIGHTS.get(key)
+
+
+def parse_target_fps(fps: str | int | float | None) -> int | None:
+    """Map an fps choice to an allowed integer fps. None = keep original."""
+    if fps is None:
+        return None
+    text = str(fps).strip().lower().replace("fps", "").strip()
+    if not text or text in {"original", "source", "auto"}:
+        return None
+    try:
+        value = int(round(float(text)))
+    except ValueError:
+        return None
+    return value if value in ALLOWED_FPS else None
+
+
+def parse_aspect(aspect: str | None) -> str | None:
+    """Normalize an aspect choice. None = keep the source aspect."""
+    if aspect is None:
+        return None
+    key = str(aspect).strip().lower()
+    if not key or key in {"original", "source", "auto"}:
+        return None
+    return key if key in ASPECT_RATIOS else None
+
+
+def parse_fit(fit: str | None) -> str:
+    """Normalize the reframe fit; defaults to letterbox (no content lost)."""
+    key = str(fit or "").strip().lower()
+    return key if key in ALLOWED_FITS else "letterbox"
+
+
+def aspect_box(aspect: str, short_side: int) -> tuple[int, int]:
+    """Even-dimension (width, height) for an aspect, given its shorter side."""
+    aw, ah = ASPECT_RATIOS[aspect]
+    if aw >= ah:  # landscape or square -> height is the short side
+        h = short_side
+        w = round(short_side * aw / ah)
+    else:  # portrait -> width is the short side
+        w = short_side
+        h = round(short_side * ah / aw)
+    return w - (w % 2), h - (h % 2)
+
+
+def probe_video_height(path: Path) -> int:
+    result = subprocess.run(
+        [
+            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=height", "-of",
+            "default=noprint_wrappers=1:nokey=1", str(path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    try:
+        return int(result.stdout.strip().splitlines()[0])
+    except (ValueError, IndexError):
+        return 0
+
+
+def finalize_output(
+    output_path: Path,
+    target_height: int | None,
+    fps: int | None,
+    aspect: str | None = None,
+    fit: str = "letterbox",
+) -> None:
+    """Optional final pass to reframe (aspect), downscale (resolution), and/or
+    change fps.
+
+    Only runs when the user picked a non-original setting, so the default render
+    path takes no extra encode.
+
+    - aspect: reframes to a fixed 16:9 / 9:16 / 1:1 box. ``fit="letterbox"`` pads
+      with black bars (keeps all content); ``fit="crop"`` fills and crops the
+      overflow. The box's short side follows the chosen resolution (or 1080).
+    - resolution only (no aspect): downscales to the target height, never
+      upscaling — if the output is already shorter, scaling is skipped.
+    """
+    filters: list[str] = []
+    if aspect:
+        short = target_height or DEFAULT_ASPECT_SHORT
+        w, h = aspect_box(aspect, short)
+        if fit == "crop":
+            filters.append(
+                f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos"
+            )
+            filters.append(f"crop={w}:{h}")
+        else:  # letterbox
+            filters.append(
+                f"scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos"
+            )
+            filters.append(f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black")
+        filters.append("setsar=1")
+    elif target_height:
+        src_h = probe_video_height(output_path)
+        if src_h and src_h > target_height:
+            filters.append(f"scale=-2:{target_height}:flags=lanczos")
+
+    if not filters and not fps:
+        return  # nothing to do
+
+    args = ["-i", str(output_path)]
+    if filters:
+        args += ["-vf", ",".join(filters)]
+    if fps:
+        args += ["-r", str(fps)]
+    args += [*VIDEO_ENCODE, "-c:a", "aac", "-b:a", "256k", "-movflags", "+faststart"]
+    tmp = output_path.with_name(output_path.stem + ".final" + output_path.suffix)
+    try:
+        dur = probe_stream_duration(output_path, "v:0")
+    except Exception:
+        dur = None
+    run_ffmpeg([*args, str(tmp)], expected_seconds=dur)
+    tmp.replace(output_path)
+
 
 def format_ffmpeg_error(stderr: str) -> str:
     if "No space left on device" in stderr:
@@ -55,14 +266,58 @@ def format_ffmpeg_error(stderr: str) -> str:
     return lines[-1] if lines else "Video processing failed."
 
 
-def run_ffmpeg(args: list[str]) -> None:
-    result = subprocess.run(
-        ["ffmpeg", "-y", *args],
-        capture_output=True,
+def run_ffmpeg(args: list[str], *, expected_seconds: float | None = None) -> None:
+    """Run ffmpeg. When a progress reporter is active and a duration is known
+    (``expected_seconds`` or a ``-t`` in ``args``), stream ``-progress`` updates
+    into the current progress phase.
+    """
+    duration = expected_seconds if expected_seconds and expected_seconds > 0 else _extract_dash_t(args)
+    track = _progress_cb is not None and duration is not None and duration > 0.05
+
+    if not track:
+        result = subprocess.run(
+            ["ffmpeg", "-y", *args],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(format_ffmpeg_error(result.stderr))
+        return
+
+    cmd = ["ffmpeg", "-y", "-nostats", "-progress", "pipe:1", *args]
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
+        bufsize=1,
     )
-    if result.returncode != 0:
-        raise RuntimeError(format_ffmpeg_error(result.stderr))
+    assert proc.stdout is not None
+    last_emit = 0.0
+    try:
+        for raw in proc.stdout:
+            line = raw.strip()
+            if line.startswith("out_time_ms="):
+                try:
+                    ms = int(line.split("=", 1)[1])
+                except ValueError:
+                    continue
+                local = min(99.0, (ms / 1000.0) / duration * 100.0)
+                now = time.monotonic()
+                if local - last_emit >= 0.5 or local >= 99.0:
+                    last_emit = local
+                    _emit_phase_progress(local)
+            elif line == "progress=end":
+                _emit_phase_progress(100.0)
+        stderr = proc.stderr.read() if proc.stderr else ""
+        code = proc.wait()
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait()
+
+    if code != 0:
+        raise RuntimeError(format_ffmpeg_error(stderr))
 
 
 def ensure_disk_space(path: Path, target_seconds: float) -> None:
@@ -444,9 +699,11 @@ def resolve_merge_plan(
     if loop_count is not None:
         return loop_count * source_duration, mode, loop_count
 
-    raise ValueError(
-        "Provide target duration or loop count when using only video or only audio."
-    )
+    # No duration / loop count → play the source once (pass-through length).
+    # Lets users apply export presets (aspect, resolution, …) without inventing a loop.
+    if source_duration <= 0:
+        raise ValueError("Could not read the source duration.")
+    return source_duration, mode, None
 
 
 def mux_video_with_audio(
@@ -550,9 +807,9 @@ def build_still_image_video(
             "-pix_fmt",
             "yuv420p",
             "-preset",
-            "medium",
+            _ENCODE_PRESET,
             "-crf",
-            "18",
+            _ENCODE_CRF,
             str(still_clip),
         ]
     )
@@ -1012,6 +1269,69 @@ def _optional_path(value: str | Path | None) -> Path | None:
     return Path(text).expanduser()
 
 
+def _parse_trim_spec(spec: object) -> tuple[float, float | None]:
+    """Return (start, end) seconds from a trim dict; end None means clip end."""
+    if not isinstance(spec, dict):
+        return 0.0, None
+
+    def num(value: object) -> float | None:
+        try:
+            return float(value)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            return None
+
+    start = num(spec.get("in")) or 0.0
+    end = num(spec.get("out"))
+    if end is not None and end <= 0:
+        end = None
+    return max(0.0, start), end
+
+
+def trim_clip(src: Path, dest: Path, start: float, seg_seconds: float) -> None:
+    """Cut ``seg_seconds`` starting at ``start`` (frame-accurate re-encode)."""
+    run_ffmpeg(
+        [
+            "-ss", f"{start:.3f}",
+            "-i", str(src),
+            "-t", f"{seg_seconds:.3f}",
+            *VIDEO_ENCODE,
+            *AUDIO_ENCODE,
+            str(dest),
+        ]
+    )
+
+
+def apply_trims(
+    clips: list[Path], trims: list | None, work_dir: Path
+) -> list[Path]:
+    """Replace clips that have an in/out point with trimmed copies.
+
+    ``trims`` is aligned to ``clips`` by index; each entry is a dict with
+    numeric ``in``/``out`` seconds. Values are clamped to the clip's real
+    duration; a clip with no (or an invalid) trim is passed through untouched.
+    """
+    if not trims or not clips:
+        return clips
+    result: list[Path] = []
+    for index, clip in enumerate(clips):
+        spec = trims[index] if index < len(trims) else None
+        start, end = _parse_trim_spec(spec)
+        if start <= 0 and end is None:
+            result.append(clip)
+            continue
+        duration = probe_stream_duration(clip, "v:0")
+        start = max(0.0, min(start, max(0.0, duration - 0.05)))
+        end = duration if end is None else min(end, duration)
+        seg = end - start
+        if seg < 0.05:  # nothing meaningful left; keep the original clip
+            result.append(clip)
+            continue
+        dest = work_dir / f"trim-{index:03d}.mp4"
+        trim_clip(clip, dest, start, seg)
+        result.append(dest)
+    return result
+
+
 def run_merge(
     *,
     video_path: str | Path | None = None,
@@ -1026,6 +1346,13 @@ def run_merge(
     stitch: bool = False,
     keep_source_audio: bool = True,
     mute: bool = False,
+    resolution: str | int | None = None,
+    fps: str | int | float | None = None,
+    quality: str | None = None,
+    aspect: str | None = None,
+    fit: str | None = None,
+    trims: list | None = None,
+    progress_callback=None,
     work_dir: str | Path | None = None,
 ) -> dict:
     """Merge video/image + audio and write an MP4 into output_folder.
@@ -1041,8 +1368,32 @@ def run_merge(
     ``mute`` only applies when there is video but no external ``audio_path``:
     when True the output is silent, when False the video's own audio is kept.
 
+    ``quality`` selects a libx264 speed/quality profile ("draft", "balanced",
+    "high"; default "high"). ``resolution`` ("720"/"1080"/"1440"/"4k" or
+    "original") downscales the final output (never upscales) and ``fps``
+    (24/25/30/48/50/60 or "original") changes the frame rate — both applied as
+    a final pass only when they differ from the source.
+
+    ``aspect`` ("16:9"/"9:16"/"1:1" or "original") reframes the output to a
+    fixed box; ``fit`` ("letterbox" pads with bars, "crop" fills and crops)
+    controls how the source fits that box. The box's short side follows
+    ``resolution`` (or 1080 when resolution is original).
+
+    ``trims`` is an optional list aligned to ``video_paths`` by index; each
+    entry {"in": start, "out": end} cuts that clip to the given seconds before
+    any loop/stitch/stage. Missing or invalid entries leave the clip untouched.
+
+    ``progress_callback(pct, message)`` receives live 0–100 updates while
+    ffmpeg encodes (used by the web worker for the status bar).
+
     Returns a dict with path, filename, duration_seconds, loop_mode, loop_count.
     """
+    set_progress_reporter(progress_callback)
+    set_quality(quality)
+    target_height = parse_target_height(resolution)
+    target_fps = parse_target_fps(fps)
+    target_aspect = parse_aspect(aspect)
+    target_fit = parse_fit(fit)
     clips: list[Path] = []
     if video_paths:
         for item in video_paths:
@@ -1107,6 +1458,11 @@ def run_merge(
     do_stitch = stitch and len(clips) >= 2
 
     try:
+        report_progress(1, "Preparing…")
+        # Cut per-clip in/out points before any loop/stitch/stage runs.
+        set_progress_phase(2, 18, "Trimming clips…")
+        clips = apply_trims(clips, trims, upload_dir)
+        set_progress_phase(18, 88, "Rendering…")
         if do_stitch:
             total_duration = sum(
                 probe_stream_duration(clip, "v:0") for clip in clips
@@ -1240,7 +1596,15 @@ def run_merge(
                     loop_count=resolved_loop_count,
                     work_dir=upload_dir,
                 )
+
+        # Optional export-preset pass (skipped on original aspect + res + fps).
+        set_progress_phase(88, 99, "Applying export preset…")
+        finalize_output(
+            output_path, target_height, target_fps, target_aspect, target_fit
+        )
+        report_progress(100, "Finishing…")
     finally:
+        set_progress_reporter(None)
         shutil.rmtree(upload_dir, ignore_errors=True)
 
     return {

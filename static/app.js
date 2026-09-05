@@ -40,6 +40,21 @@ const stitchToggle = $("stitch-toggle");
 const sourceAudioSection = $("source-audio-section");
 const loopRadios = () => document.querySelectorAll('input[name="loop_mode"]');
 const sourceAudioValue = () => document.querySelector('input[name="source_audio"]:checked')?.value || "keep";
+const resolutionInput = $("resolution-input");
+const fpsInput = $("fps-input");
+const aspectInput = $("aspect-input");
+const qualityValue = () => document.querySelector('#quality-toggle .quality-btn.active')?.dataset.quality || "high";
+const fitValue = () => document.querySelector('#fit-toggle .fit-btn.active')?.dataset.fit || "letterbox";
+const trimInInput = $("trim-in");
+const trimOutInput = $("trim-out");
+const round1 = (n) => Math.round(n * 10) / 10;
+const selectedMedia = () => state.media.find((x) => x.id === state.selectedId) || null;
+function effDuration(m) {
+  if (!m || m.kind !== "video" || m.duration == null) return m ? (m.duration || 0) : 0;
+  const s = m.trimIn || 0;
+  const e = m.trimOut != null ? m.trimOut : m.duration;
+  return Math.max(0.05, e - s);
+}
 
 /* Dedicated audio element for previewing audio-only files */
 const audioEl = new Audio();
@@ -76,7 +91,7 @@ function fmtSize(bytes) {
 
 /* ---------- toast ---------- */
 let toastTimer = null;
-function toast(msg, type = "info", { spinner = false, sticky = false } = {}) {
+function toast(msg, type = "info", { spinner = false, sticky = false, progress = null } = {}) {
   const el = $("toast");
   const existingLink = document.getElementById("toast-download");
   if (existingLink) existingLink.remove();
@@ -84,11 +99,29 @@ function toast(msg, type = "info", { spinner = false, sticky = false } = {}) {
   $("toast-spinner").classList.toggle("hidden", !spinner);
   $("toast-icon").classList.toggle("hidden", spinner);
   $("toast-icon").textContent = type === "error" ? "error" : type === "success" ? "check_circle" : "info";
+  setToastProgress(progress);
   el.className = `fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] show toast-${type}`;
   clearTimeout(toastTimer);
   if (!sticky) toastTimer = setTimeout(() => el.classList.remove("show"), 4200);
 }
 function hideToast() { clearTimeout(toastTimer); $("toast").classList.remove("show"); }
+
+function setToastProgress(progress) {
+  const wrap = $("toast-progress-wrap");
+  const bar = $("toast-progress-bar");
+  const pctEl = $("toast-pct");
+  if (progress == null || !isFinite(progress)) {
+    wrap.classList.add("hidden");
+    pctEl.classList.add("hidden");
+    bar.style.width = "0%";
+    return;
+  }
+  const pct = Math.max(0, Math.min(100, Number(progress)));
+  wrap.classList.remove("hidden");
+  pctEl.classList.remove("hidden");
+  bar.style.width = `${pct}%`;
+  pctEl.textContent = `${Math.round(pct)}%`;
+}
 
 /* ---------- media management ---------- */
 function addMedia(file, kind) {
@@ -102,6 +135,8 @@ function addMedia(file, kind) {
     duration: null,
     width: null,
     height: null,
+    trimIn: null,   // seconds; null = from start
+    trimOut: null,  // seconds; null = to end
   };
   state.media.push(item);
   loadMeta(item);
@@ -125,6 +160,27 @@ function removeMedia(id) {
   }
   renderAll();
   if (state.selectedId) selectMedia(state.selectedId, false);
+  else clearMonitor();
+}
+
+/** Reorder a video among other videos. ``place`` is "before" or "after" targetId. */
+function reorderVideo(dragId, targetId, place = "before") {
+  if (!dragId || dragId === targetId) return false;
+  const drag = state.media.find((m) => m.id === dragId);
+  const target = state.media.find((m) => m.id === targetId);
+  if (!drag || drag.kind !== "video" || !target || target.kind !== "video") return false;
+
+  const without = state.media.filter((m) => m.id !== dragId);
+  let insertAt = without.findIndex((m) => m.id === targetId);
+  if (insertAt < 0) return false;
+  if (place === "after") insertAt += 1;
+  without.splice(insertAt, 0, drag);
+  state.media = without;
+  return true;
+}
+
+function videoOrderIndex(id) {
+  return videos().findIndex((m) => m.id === id);
 }
 
 function loadMeta(item) {
@@ -175,8 +231,34 @@ function clearAll() {
   state.media.forEach((m) => URL.revokeObjectURL(m.url));
   state.media = [];
   state.selectedId = null;
+  clearMonitor();
   renderAll();
   toast("Cleared all media.", "info");
+}
+
+/** Reset the program monitor to the empty placeholder state. */
+function clearMonitor() {
+  stopPlayback();
+  activeEl = null;
+  try { monitorVideo.pause(); } catch (e) {}
+  monitorVideo.removeAttribute("src");
+  monitorVideo.load();
+  monitorImage.removeAttribute("src");
+  try { audioEl.pause(); } catch (e) {}
+  audioEl.removeAttribute("src");
+
+  monitorVideo.classList.add("hidden");
+  monitorImage.classList.add("hidden");
+  monitorAudio.classList.add("hidden");
+  monitorAudio.classList.remove("flex");
+  monitorPlaceholder.classList.remove("hidden");
+
+  $("monitor-source").textContent = "No clip selected";
+  $("monitor-kind").textContent = "—";
+  $("tc-current").textContent = "00:00.000";
+  $("tc-total").textContent = "00:00.000";
+  playBtn.disabled = true;
+  setPlayIcon(false);
 }
 
 /* ---------- rendering ---------- */
@@ -185,6 +267,7 @@ function renderAll() {
   renderTimeline();
   renderInfo();
   renderInspectorState();
+  renderTrimState();
   renderHeader();
 }
 
@@ -194,11 +277,17 @@ function renderBin() {
   binEmpty.classList.toggle("hidden", state.media.length > 0);
   binGrid.classList.toggle("hidden", state.media.length === 0);
   binGrid.innerHTML = "";
+  const canReorder = videos().length >= 2;
 
   for (const m of items) {
     const card = document.createElement("div");
-    card.className = `bin-card${m.id === state.selectedId ? " selected" : ""}`;
+    card.className = `bin-card${m.id === state.selectedId ? " selected" : ""}${m.kind === "video" && canReorder ? " reorderable" : ""}`;
     card.dataset.id = m.id;
+    card.dataset.kind = m.kind;
+    if (m.kind === "video" && canReorder) {
+      card.draggable = true;
+      card.title = "Drag to reorder play order";
+    }
 
     let thumbInner;
     if (m.kind === "image") thumbInner = `<img src="${m.url}" alt="">`;
@@ -206,10 +295,15 @@ function renderBin() {
     else thumbInner = `<span class="material-symbols-outlined text-secondary-fixed-dim text-[28px]">graphic_eq</span>`;
 
     const dur = m.duration != null ? fmtTC(m.duration) : (m.kind === "image" ? "still" : "…");
+    const order = m.kind === "video" && canReorder ? videoOrderIndex(m.id) + 1 : 0;
+    const orderBadge = order
+      ? `<span class="order-badge" title="Play order">${order}</span>`
+      : "";
     card.innerHTML = `
       <div class="thumb">
         ${thumbInner}
         <span class="kind-badge kind-${m.kind}">${m.kind}</span>
+        ${orderBadge}
         <span class="dur-badge">${dur}</span>
         <button class="remove-btn" title="Remove" data-remove="${m.id}"><span class="material-symbols-outlined text-[13px]">close</span></button>
         <div class="selected-check"><span class="material-symbols-outlined text-primary-container text-[22px] drop-shadow">check_circle</span></div>
@@ -224,7 +318,7 @@ function renderBin() {
 
 function projectDuration() {
   const vids = videos();
-  const vidTotal = vids.reduce((a, m) => a + (m.duration || 0), 0);
+  const vidTotal = vids.reduce((a, m) => a + effDuration(m), 0);
   const aud = audio();
   const audDur = aud ? aud.duration || 0 : 0;
   const img = image();
@@ -240,16 +334,16 @@ function renderTimeline() {
   v1.innerHTML = "";
   a1.innerHTML = "";
 
-  // V1
+  // V1 — scale by source duration so trimmed clips visibly shrink (edge-drag works).
   $("v1-empty").classList.toggle("hidden", vids.length > 0 || !!img);
   if (img) {
     v1.appendChild(clipTile(img, 1, "still"));
   } else {
-    const total = vids.reduce((a, m) => a + (m.duration || 1), 0) || 1;
+    const sourceTotal = vids.reduce((a, m) => a + (m.duration || 1), 0) || 1;
     let acc = 0;
     vids.forEach((m) => {
-      const d = m.duration || total / vids.length;
-      const tile = clipTile(m, d / total, `${fmtTC(acc)}`);
+      const d = effDuration(m) || sourceTotal / vids.length;
+      const tile = clipTile(m, d / sourceTotal, `${fmtTC(acc)}`);
       v1.appendChild(tile);
       acc += d;
     });
@@ -263,7 +357,7 @@ function renderTimeline() {
     lane.className = "wave-lane bin-card-none";
     lane.dataset.id = aud.id;
     lane.style.cursor = "pointer";
-    if (aud.id === state.selectedId) { lane.style.outline = "2px solid #facc15"; lane.style.outlineOffset = "-2px"; }
+    if (aud.id === state.selectedId) { lane.style.outline = "2px solid #60a5fa"; lane.style.outlineOffset = "-2px"; }
     lane.innerHTML = `
       ${waveformSVG()}
       <div class="wave-label">
@@ -275,7 +369,7 @@ function renderTimeline() {
     a1.appendChild(lane);
   }
 
-  // ruler + totals
+  // ruler + totals (effective / export length)
   const total = projectDuration();
   $("deck-total").textContent = fmtTC(total);
   const ticks = $("ruler-ticks");
@@ -292,22 +386,56 @@ function renderTimeline() {
 
 function clipTile(m, flexRatio, label) {
   const el = document.createElement("div");
-  el.className = `tl-clip${m.id === state.selectedId ? " selected" : ""}`;
-  el.style.flex = `${Math.max(flexRatio, 0.06)} 1 0%`;
+  const canReorder = m.kind === "video" && videos().length >= 2;
+  el.className = `tl-clip${m.id === state.selectedId ? " selected" : ""}${canReorder ? " reorderable" : ""}`;
+  el.style.flex = `0 0 ${Math.max(flexRatio * 100, 4)}%`;
+  el.style.maxWidth = "100%";
   el.dataset.id = m.id;
+  el.dataset.kind = m.kind;
+  if (canReorder) {
+    el.draggable = true;
+    el.title = "Drag to reorder · edges trim In/Out";
+  }
   const thumb = m.kind === "image"
     ? `<img class="tl-thumb" src="${m.url}" alt="">`
     : `<video class="tl-thumb" src="${m.url}" muted preload="metadata"></video>`;
+  const durLabel = m.kind === "video" && m.duration != null
+    ? ((m.trimIn != null || m.trimOut != null) ? fmtTC(effDuration(m)) : fmtTC(m.duration))
+    : (m.duration != null ? fmtTC(m.duration) : label);
+  const handles = m.kind === "video"
+    ? `<div class="tl-handle tl-handle-in" data-trim="in" title="Drag to set In"></div>
+       <div class="tl-handle tl-handle-out" data-trim="out" title="Drag to set Out"></div>`
+    : "";
+  const order = canReorder ? videoOrderIndex(m.id) + 1 : 0;
+  const orderBadge = order ? `<span class="tl-order">${order}</span>` : "";
   el.innerHTML = `
     <div class="tl-check"></div>
-    <div class="relative z-10 flex items-center gap-1.5">
+    ${handles}
+    ${orderBadge}
+    <div class="relative z-10 flex items-center gap-1.5 pointer-events-none">
       ${thumb}
       <div class="flex flex-col overflow-hidden">
         <span class="font-label-mono-xs text-[10px] font-semibold truncate ${m.id === state.selectedId ? "text-primary-container" : "text-on-surface"}">${m.name}</span>
-        <span class="font-label-mono-xs text-[8px] text-on-surface-variant">${m.duration != null ? fmtTC(m.duration) : label}</span>
+        <span class="tl-dur font-label-mono-xs text-[8px] text-on-surface-variant">${durLabel}</span>
       </div>
     </div>`;
-  el.addEventListener("click", () => selectMedia(m.id));
+  el.addEventListener("click", (e) => {
+    if (e.target.closest(".tl-handle") || trimDrag.moved || clipReorder.moved) return;
+    selectMedia(m.id);
+  });
+  if (m.kind === "video") {
+    el.querySelectorAll(".tl-handle").forEach((h) => {
+      h.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Don't let HTML5 reorder drag steal the trim gesture.
+        el.draggable = false;
+        startTrimDrag(m, h.dataset.trim, e, el);
+      });
+      h.addEventListener("pointerup", () => { if (canReorder) el.draggable = true; });
+      h.addEventListener("pointercancel", () => { if (canReorder) el.draggable = true; });
+    });
+  }
   return el;
 }
 
@@ -355,6 +483,172 @@ function renderInfo() {
     </div>`).join("");
 }
 
+/* ---------- per-clip trim ---------- */
+const trimDrag = {
+  active: false,
+  moved: false,
+  mediaId: null,
+  which: null,      // "in" | "out"
+  startX: 0,
+  startIn: 0,
+  startOut: 0,
+  pxPerSec: 1,
+  tip: null,
+};
+const clipReorder = { dragId: null, moved: false };
+
+function updateTrimLength(m) {
+  const trimmed = m.trimIn != null || m.trimOut != null;
+  $("trim-length").textContent = trimmed ? `trimmed · ${fmtTC(effDuration(m))}` : "full clip";
+}
+
+function renderTrimState() {
+  const m = selectedMedia();
+  const isVideo = !!m && m.kind === "video";
+  $("trim-controls").classList.toggle("hidden", !isVideo);
+  $("trim-hint").classList.toggle("hidden", isVideo);
+  $("trim-clip-name").textContent = isVideo ? m.name : "no clip";
+  if (!isVideo) return;
+  trimInInput.value = m.trimIn != null ? round1(m.trimIn) : "";
+  trimOutInput.value = m.trimOut != null ? round1(m.trimOut) : "";
+  updateTrimLength(m);
+}
+
+/** Clamp and store in/out on a media item; syncs inspector when that clip is selected. */
+function applyTrimValues(m, nextIn, nextOut, { refreshTimeline = true } = {}) {
+  if (!m || m.kind !== "video") return;
+  const dur = m.duration || 0;
+  let tin = nextIn;
+  let tout = nextOut;
+  if (tin == null || !isFinite(tin) || tin <= 0) tin = null;
+  else tin = Math.min(tin, Math.max(0, dur - 0.05));
+  if (tout == null || !isFinite(tout) || tout <= 0) tout = null;
+  else tout = dur ? Math.min(tout, dur) : tout;
+  if (tin != null && tout != null && tout <= tin + 0.05) {
+    // Keep a tiny usable window when dragging edges toward each other.
+    if (trimDrag.which === "in") tin = Math.max(0, tout - 0.1);
+    else tout = Math.min(dur || tin + 0.1, tin + 0.1);
+  }
+  m.trimIn = tin != null && tin > 0 ? tin : null;
+  m.trimOut = tout != null && tout > 0 && (!dur || tout < dur - 0.02) ? tout : null;
+  if (m.id === state.selectedId) {
+    trimInInput.value = m.trimIn != null ? round1(m.trimIn) : "";
+    trimOutInput.value = m.trimOut != null ? round1(m.trimOut) : "";
+    updateTrimLength(m);
+  }
+  if (refreshTimeline) renderTimeline();
+}
+
+function commitTrim() {
+  const m = selectedMedia();
+  if (!m || m.kind !== "video") return;
+  const ti = parseFloat(trimInInput.value);
+  const to = parseFloat(trimOutInput.value);
+  applyTrimValues(m, isFinite(ti) ? ti : null, isFinite(to) ? to : null);
+}
+
+function setTrimFromPlayhead(which) {
+  const m = selectedMedia();
+  if (!m || m.kind !== "video") return;
+  const t = round1(monitorVideo.currentTime || 0);
+  (which === "in" ? trimInInput : trimOutInput).value = t;
+  commitTrim();
+}
+
+function ensureTrimTip() {
+  let tip = document.getElementById("trim-drag-tip");
+  if (!tip) {
+    tip = document.createElement("div");
+    tip.id = "trim-drag-tip";
+    document.body.appendChild(tip);
+  }
+  return tip;
+}
+
+function startTrimDrag(m, which, e, tileEl) {
+  if (!m.duration) return;
+  // Select the clip so the inspector Trim panel tracks the drag.
+  if (state.selectedId !== m.id) selectMedia(m.id, false);
+
+  const track = $("track-v1");
+  const sourceTotal = videos().reduce((a, x) => a + (x.duration || 1), 0) || 1;
+  const trackW = track.clientWidth || 1;
+  const pxPerSec = trackW / sourceTotal;
+
+  trimDrag.active = true;
+  trimDrag.moved = false;
+  trimDrag.mediaId = m.id;
+  trimDrag.which = which;
+  trimDrag.startX = e.clientX;
+  trimDrag.startIn = m.trimIn || 0;
+  trimDrag.startOut = m.trimOut != null ? m.trimOut : m.duration;
+  trimDrag.pxPerSec = Math.max(pxPerSec, 0.001);
+
+  // selectMedia may have re-rendered — grab the live tile.
+  const liveTile = () => document.querySelector(`.tl-clip[data-id="${m.id}"]`);
+  liveTile()?.classList.add("trimming");
+  document.body.classList.add("tl-trimming");
+
+  const tip = ensureTrimTip();
+  tip.textContent = which === "in"
+    ? `IN ${fmtTC(trimDrag.startIn)}`
+    : `OUT ${fmtTC(trimDrag.startOut)}`;
+  tip.style.left = `${e.clientX + 12}px`;
+  tip.style.top = `${e.clientY - 28}px`;
+
+  try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
+
+  /** Live resize without full timeline rebuild (keeps handles under the cursor). */
+  function paintLive() {
+    const vids = videos();
+    const total = vids.reduce((a, x) => a + (x.duration || 1), 0) || 1;
+    vids.forEach((clip) => {
+      const el = document.querySelector(`.tl-clip[data-id="${clip.id}"]`);
+      if (!el) return;
+      el.style.flex = `0 0 ${Math.max((effDuration(clip) / total) * 100, 4)}%`;
+      const durEl = el.querySelector(".tl-dur");
+      if (durEl) durEl.textContent = fmtTC(effDuration(clip));
+    });
+    $("deck-total").textContent = fmtTC(projectDuration());
+    liveTile()?.classList.add("trimming");
+  }
+
+  const onMove = (ev) => {
+    if (!trimDrag.active || trimDrag.mediaId !== m.id) return;
+    const dx = ev.clientX - trimDrag.startX;
+    if (Math.abs(dx) > 2) trimDrag.moved = true;
+    const dSec = dx / trimDrag.pxPerSec;
+    if (which === "in") {
+      applyTrimValues(m, round1(trimDrag.startIn + dSec), trimDrag.startOut, { refreshTimeline: false });
+    } else {
+      applyTrimValues(m, trimDrag.startIn, round1(trimDrag.startOut + dSec), { refreshTimeline: false });
+    }
+    paintLive();
+    tip.textContent = which === "in"
+      ? `IN ${fmtTC(m.trimIn || 0)}`
+      : `OUT ${fmtTC(m.trimOut != null ? m.trimOut : m.duration)}`;
+    tip.style.left = `${ev.clientX + 12}px`;
+    tip.style.top = `${ev.clientY - 28}px`;
+  };
+
+  const onUp = () => {
+    trimDrag.active = false;
+    document.body.classList.remove("tl-trimming");
+    tip.remove();
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onUp);
+    renderTimeline();
+    renderTrimState();
+    // Ignore the click that follows pointerup after a drag.
+    setTimeout(() => { trimDrag.moved = false; }, 0);
+  };
+
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
+}
+
 /* ---------- inspector state / validation ---------- */
 function renderInspectorState() {
   const vids = videos();
@@ -377,7 +671,7 @@ function renderInspectorState() {
   // loop note
   const note = $("loop-note");
   if (singleVideoAndAudio) note.textContent = "Pick how the single video pairs with your audio.";
-  else if (multiVideo) note.textContent = "Multiple clips are staged in order. Enable stitch to play once instead of looping to audio.";
+  else if (multiVideo) note.textContent = "Drag clips in the bin or timeline to set play order. Enable stitch to join once instead of looping to audio.";
   else if (noExternalAudio) note.textContent = "No soundtrack added — choose whether to keep the clip's audio or mute it.";
   else note.textContent = "Add one video + an audio file to unlock loop modes.";
 
@@ -411,8 +705,6 @@ function validate() {
 
   if (img && !aud && !duration) return { ok: false, mode, msg: "Provide a target duration (minutes) for a still image." };
   if (vids.length === 1 && aud && !loopMode) return { ok: false, mode, msg: "Choose a loop mode (video / audio / both)." };
-  const singleOnly = (vids.length === 1 && !aud && !img) || (aud && !vids.length && !img);
-  if (singleOnly && !duration && !loopCount) return { ok: false, mode, msg: "Provide a target duration or loop count." };
   if (stitch && vids.length < 2) return { ok: false, mode, msg: "Add at least two videos to stitch." };
 
   return { ok: true, mode, msg: "" };
@@ -430,6 +722,7 @@ function selectMedia(id, autoPreview = true) {
   renderBin();
   renderTimeline();
   renderInfo();
+  renderTrimState();
   if (!m) return;
 
   stopPlayback();
@@ -510,6 +803,16 @@ async function submitMerge() {
   fd.append("loop_count", loopCountInput.value.trim());
   fd.append("output_filename", filenameInput.value.trim() || "my-video.mp4");
   if (loopMode) fd.append("loop_mode", loopMode.value);
+  fd.append("resolution", resolutionInput.value || "original");
+  fd.append("fps", fpsInput.value || "original");
+  fd.append("quality", qualityValue());
+  fd.append("aspect", aspectInput.value || "original");
+  fd.append("fit", fitValue());
+  // Per-clip trims aligned to the videos order (only sent if any are set).
+  if (vids.some((m) => (m.trimIn && m.trimIn > 0) || (m.trimOut && m.trimOut > 0))) {
+    const trims = vids.map((m) => ({ in: m.trimIn || 0, out: m.trimOut || null }));
+    fd.append("trims", JSON.stringify(trims));
+  }
   fd.append("mute", mute ? "1" : "0");
   if (stitch) {
     fd.append("stitch", "1");
@@ -550,12 +853,15 @@ function pollJob(jobId) {
       return;
     }
     if (data.status === "queued") {
-      toast("Queued — waiting for a free render worker…", "info", { spinner: true, sticky: true });
+      toast("Queued — waiting for a free render worker…", "info", { spinner: true, sticky: true, progress: 0 });
       setTimeout(poll, 1500);
     } else if (data.status === "processing") {
-      toast("Rendering… this can take a bit for long or high-res videos.", "info", { spinner: true, sticky: true });
-      setTimeout(poll, 1500);
+      const pct = data.progress != null ? Number(data.progress) : 0;
+      const msg = data.message || (pct > 0 ? `Rendering… ${Math.round(pct)}%` : "Rendering…");
+      toast(msg, "info", { spinner: true, sticky: true, progress: pct });
+      setTimeout(poll, 800);
     } else if (data.status === "done") {
+      setToastProgress(100);
       showDownload(data);
       reenableButtons();
     } else if (data.status === "error") {
@@ -575,13 +881,14 @@ function showDownload(data) {
   $("toast-icon").classList.remove("hidden");
   $("toast-icon").textContent = "check_circle";
   $("toast-msg").textContent = `Ready: ${data.filename}`;
+  setToastProgress(null);
   let link = document.getElementById("toast-download");
   if (!link) {
     link = document.createElement("a");
     link.id = "toast-download";
     link.className = "ml-1 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-action-button text-[12px] font-semibold hover:brightness-110";
     link.innerHTML = '<span class="material-symbols-outlined text-[16px]">download</span>Download';
-    $("toast-inner").appendChild(link);
+    $("toast-row").appendChild(link);
   }
   link.href = data.download_url;
   link.setAttribute("download", data.filename || "");
@@ -591,6 +898,84 @@ function showDownload(data) {
 
 /* ---------- wiring ---------- */
 function openPicker() { importInput.click(); }
+
+/* ---------- clip reorder (bin + timeline) ---------- */
+function clearDropIndicators() {
+  document.querySelectorAll(".drop-before, .drop-after").forEach((el) => {
+    el.classList.remove("drop-before", "drop-after");
+  });
+}
+
+function clearReorderDrag() {
+  clearDropIndicators();
+  document.querySelectorAll(".is-dragging").forEach((el) => el.classList.remove("is-dragging"));
+}
+
+function dropPlaceFor(el, clientX, clientY) {
+  const rect = el.getBoundingClientRect();
+  // Timeline is horizontal; bin is a 2-col grid — use the dominant axis.
+  if (el.classList.contains("tl-clip")) {
+    return clientX < rect.left + rect.width / 2 ? "before" : "after";
+  }
+  return clientY < rect.top + rect.height / 2 ? "before" : "after";
+}
+
+function bindReorderSurface(root, itemSelector) {
+  root.addEventListener("dragstart", (e) => {
+    if (trimDrag.active) { e.preventDefault(); return; }
+    const item = e.target.closest(itemSelector);
+    if (!item || !item.draggable || item.dataset.kind !== "video") return;
+    if (e.target.closest(".tl-handle, .remove-btn")) { e.preventDefault(); return; }
+    clipReorder.dragId = item.dataset.id;
+    clipReorder.moved = false;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", item.dataset.id);
+    requestAnimationFrame(() => item.classList.add("is-dragging"));
+  });
+
+  root.addEventListener("dragend", () => {
+    clearReorderDrag();
+    clipReorder.dragId = null;
+    setTimeout(() => { clipReorder.moved = false; }, 0);
+  });
+
+  root.addEventListener("dragover", (e) => {
+    if (!clipReorder.dragId) return;
+    const item = e.target.closest(itemSelector);
+    if (!item || item.dataset.kind !== "video" || item.dataset.id === clipReorder.dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    clearDropIndicators();
+    const place = dropPlaceFor(item, e.clientX, e.clientY);
+    item.classList.add(place === "before" ? "drop-before" : "drop-after");
+  });
+
+  root.addEventListener("dragleave", (e) => {
+    const item = e.target.closest(itemSelector);
+    if (!item) return;
+    if (item.contains(e.relatedTarget)) return;
+    item.classList.remove("drop-before", "drop-after");
+  });
+
+  root.addEventListener("drop", (e) => {
+    if (!clipReorder.dragId) return;
+    const item = e.target.closest(itemSelector);
+    if (!item || item.dataset.kind !== "video") return;
+    e.preventDefault();
+    const place = dropPlaceFor(item, e.clientX, e.clientY);
+    const changed = reorderVideo(clipReorder.dragId, item.dataset.id, place);
+    clearReorderDrag();
+    clipReorder.dragId = null;
+    if (changed) {
+      clipReorder.moved = true;
+      renderAll();
+      if (state.selectedId) selectMedia(state.selectedId, false);
+    }
+  });
+}
+
+bindReorderSurface(binGrid, ".bin-card");
+bindReorderSurface($("track-v1"), ".tl-clip");
 
 importInput.addEventListener("change", () => { addFiles(importInput.files); importInput.value = ""; });
 $("import-btn").addEventListener("click", openPicker);
@@ -636,6 +1021,70 @@ $("inspector-tabs").addEventListener("click", (e) => {
   document.querySelectorAll("[data-panel]").forEach((p) => p.classList.toggle("hidden", p.dataset.panel !== btn.dataset.tab));
 });
 
+// Quality vs Speed toggle
+const QUALITY_NOTES = {
+  draft: "Fastest render, smaller file — great for quick previews.",
+  balanced: "Solid quality with a noticeably faster render.",
+  high: "Best quality (visually lossless). Slower render, larger file.",
+};
+function renderQualityNote() {
+  const note = $("quality-note");
+  if (note) note.textContent = QUALITY_NOTES[qualityValue()] || "";
+}
+$("quality-toggle").addEventListener("click", (e) => {
+  const btn = e.target.closest(".quality-btn");
+  if (!btn) return;
+  document.querySelectorAll("#quality-toggle .quality-btn")
+    .forEach((b) => b.classList.toggle("active", b === btn));
+  renderQualityNote();
+});
+
+// Aspect / orientation + fit
+const FIT_NOTES = {
+  letterbox: "Fits the whole frame with black bars — nothing is cut off.",
+  crop: "Fills the frame and crops the overflow — no bars.",
+};
+function renderAspectState() {
+  const value = aspectInput.value || "original";
+  const reframed = value !== "original";
+  $("fit-row").classList.toggle("hidden", !reframed);
+  const note = $("fit-note");
+  if (note) note.textContent = reframed ? (FIT_NOTES[fitValue()] || "") : "";
+  document.querySelectorAll("#preview-aspect .preview-aspect-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.aspect === value);
+  });
+}
+aspectInput.addEventListener("change", renderAspectState);
+$("fit-toggle").addEventListener("click", (e) => {
+  const btn = e.target.closest(".fit-btn");
+  if (!btn) return;
+  document.querySelectorAll("#fit-toggle .fit-btn")
+    .forEach((b) => b.classList.toggle("active", b === btn));
+  renderAspectState();
+});
+$("preview-aspect").addEventListener("click", (e) => {
+  const btn = e.target.closest(".preview-aspect-btn");
+  if (!btn) return;
+  // Click active again → back to original (keep source).
+  const next = (aspectInput.value === btn.dataset.aspect) ? "original" : btn.dataset.aspect;
+  aspectInput.value = next;
+  renderAspectState();
+});
+
+// Per-clip trim
+trimInInput.addEventListener("change", commitTrim);
+trimOutInput.addEventListener("change", commitTrim);
+$("trim-in-set").addEventListener("click", () => setTrimFromPlayhead("in"));
+$("trim-out-set").addEventListener("click", () => setTrimFromPlayhead("out"));
+$("trim-clear").addEventListener("click", () => {
+  const m = selectedMedia();
+  if (!m) return;
+  m.trimIn = null;
+  m.trimOut = null;
+  renderTrimState();
+  renderTimeline();
+});
+
 // Transport
 playBtn.addEventListener("click", togglePlay);
 $("seek-start").addEventListener("click", () => { if (activeEl) activeEl.currentTime = 0; });
@@ -673,6 +1122,15 @@ $("reset-btn").addEventListener("click", () => {
   stitchToggle.checked = false;
   const keepRadio = document.querySelector('input[name="source_audio"][value="keep"]');
   if (keepRadio) keepRadio.checked = true;
+  resolutionInput.value = "original";
+  fpsInput.value = "original";
+  aspectInput.value = "original";
+  document.querySelectorAll("#quality-toggle .quality-btn")
+    .forEach((b) => b.classList.toggle("active", b.dataset.quality === "high"));
+  document.querySelectorAll("#fit-toggle .fit-btn")
+    .forEach((b) => b.classList.toggle("active", b.dataset.fit === "letterbox"));
+  renderQualityNote();
+  renderAspectState();
   renderInspectorState();
   toast("Settings reset.", "info");
 });
@@ -682,6 +1140,75 @@ $("theme-btn").addEventListener("click", () => {
   const dark = document.documentElement.classList.toggle("dark");
   $("theme-btn").querySelector(".material-symbols-outlined").textContent = dark ? "dark_mode" : "light_mode";
 });
+
+/* ---------- accent color switch ---------- */
+const DEFAULT_ACCENT = "#00e5ff";
+const ACCENT_PRESETS = [
+  { name: "Cyan", value: "#00e5ff" },
+  { name: "Blue", value: "#3b82f6" },
+  { name: "Violet", value: "#8b5cf6" },
+  { name: "Emerald", value: "#10b981" },
+  { name: "Amber", value: "#f59e0b" },
+  { name: "Rose", value: "#f43f5e" },
+];
+const ACCENT_KEY = "cf-accent";
+
+// Pick black-ish or white text for readable contrast on the accent.
+function contrastOn(hex) {
+  const c = hex.replace("#", "");
+  if (c.length < 6) return "#0c0e11";
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.55 ? "#0c0e11" : "#ffffff";
+}
+
+function applyAccent(hex, persist = true) {
+  const root = document.documentElement;
+  root.style.setProperty("--accent", hex);
+  root.style.setProperty("--on-accent", contrastOn(hex));
+  if (persist) { try { localStorage.setItem(ACCENT_KEY, hex); } catch (e) {} }
+  const custom = $("accent-custom");
+  if (custom) custom.value = hex;
+  document.querySelectorAll("#accent-swatches [data-accent]").forEach((el) => {
+    el.classList.toggle("ring-2", el.dataset.accent.toLowerCase() === hex.toLowerCase());
+  });
+}
+
+function buildAccentSwatches() {
+  const wrap = $("accent-swatches");
+  wrap.innerHTML = "";
+  ACCENT_PRESETS.forEach((p) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.accent = p.value;
+    b.title = p.name;
+    b.className = "w-7 h-7 rounded-full ring-offset-2 ring-offset-surface-container-high ring-white transition-transform hover:scale-110";
+    b.style.background = p.value;
+    b.addEventListener("click", () => applyAccent(p.value));
+    wrap.appendChild(b);
+  });
+}
+
+const accentBtn = $("accent-btn");
+const accentMenu = $("accent-menu");
+accentBtn.addEventListener("click", (e) => { e.stopPropagation(); accentMenu.classList.toggle("hidden"); });
+document.addEventListener("click", (e) => {
+  if (!accentMenu.classList.contains("hidden") &&
+      !accentMenu.contains(e.target) && !accentBtn.contains(e.target)) {
+    accentMenu.classList.add("hidden");
+  }
+});
+$("accent-custom").addEventListener("input", (e) => applyAccent(e.target.value));
+$("accent-reset").addEventListener("click", () => applyAccent(DEFAULT_ACCENT));
+
+buildAccentSwatches();
+let savedAccent = DEFAULT_ACCENT;
+try { savedAccent = localStorage.getItem(ACCENT_KEY) || DEFAULT_ACCENT; } catch (e) {}
+applyAccent(savedAccent, false);
+renderQualityNote();
+renderAspectState();
 
 // Keyboard: space toggles play
 document.addEventListener("keydown", (e) => {

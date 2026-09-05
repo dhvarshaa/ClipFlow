@@ -32,6 +32,21 @@ def process_job(job: dict) -> None:
     audio_path = str(uploads / params["audio"]) if params.get("audio") else None
 
     try:
+        last_write = [0.0]
+        last_pct = [-1.0]
+
+        def on_progress(pct: float, message: str) -> None:
+            now = time.time()
+            # Throttle DB writes; always flush near the end.
+            if pct - last_pct[0] < 0.5 and now - last_write[0] < 0.5 and pct < 99:
+                return
+            last_write[0] = now
+            last_pct[0] = pct
+            msg = message or f"Rendering… {pct:.0f}%"
+            if message and "%" not in message:
+                msg = f"{message} {pct:.0f}%"
+            jobs.set_progress(job_id, pct, msg)
+
         result = run_merge(
             video_paths=video_paths or None,
             image_path=image_path,
@@ -44,6 +59,13 @@ def process_job(job: dict) -> None:
             stitch=params.get("stitch", False),
             keep_source_audio=params.get("keep_source_audio", True),
             mute=params.get("mute", False),
+            resolution=params.get("resolution") or None,
+            fps=params.get("fps") or None,
+            quality=params.get("quality") or None,
+            aspect=params.get("aspect") or None,
+            fit=params.get("fit") or None,
+            trims=params.get("trims") or None,
+            progress_callback=on_progress,
             work_dir=str(storage.work_dir(job_id)),
         )
         jobs.mark_done(

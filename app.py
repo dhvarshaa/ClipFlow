@@ -13,6 +13,7 @@ run_merge and surfaces through job status; here we only do cheap up-front checks
 from __future__ import annotations
 
 import hmac
+import json
 import sys
 import uuid
 from pathlib import Path
@@ -95,6 +96,46 @@ def merge():
     keep_source_audio = _bool(request.form.get("keep_source_audio", "true"))
     mute = _bool(request.form.get("mute"))
 
+    # Export presets (whitelisted; anything else falls back to sane defaults).
+    resolution = request.form.get("resolution", "").strip().lower()
+    if resolution not in {"720", "1080", "1440", "4k", "2160", "original", ""}:
+        resolution = "original"
+    fps = request.form.get("fps", "").strip().lower()
+    if fps not in {"24", "25", "30", "48", "50", "60", "original", ""}:
+        fps = "original"
+    quality = request.form.get("quality", "").strip().lower()
+    if quality not in {"draft", "balanced", "high"}:
+        quality = "high"
+    aspect = request.form.get("aspect", "").strip().lower()
+    if aspect not in {"16:9", "9:16", "1:1", "original", ""}:
+        aspect = "original"
+    fit = request.form.get("fit", "").strip().lower()
+    if fit not in {"letterbox", "crop"}:
+        fit = "letterbox"
+
+    # Per-clip trim points, aligned to the videos order. Sanitized to a list of
+    # {"in": float, "out": float|None}; anything malformed is dropped.
+    trims = None
+    trims_raw = request.form.get("trims", "").strip()
+    if trims_raw:
+        try:
+            parsed = json.loads(trims_raw)
+        except ValueError:
+            parsed = None
+        if isinstance(parsed, list):
+            trims = []
+            for entry in parsed:
+                item = entry if isinstance(entry, dict) else {}
+                try:
+                    t_in = float(item.get("in") or 0)
+                except (TypeError, ValueError):
+                    t_in = 0.0
+                try:
+                    t_out = float(item.get("out")) if item.get("out") else None
+                except (TypeError, ValueError):
+                    t_out = None
+                trims.append({"in": max(0.0, t_in), "out": t_out})
+
     # --- cheap up-front validation (mirrors the frontend rules) ---
     if has_videos and has_image:
         return _err("Use either video(s) or a still image, not both.")
@@ -106,11 +147,6 @@ def merge():
         return _err(str(exc))
     if has_image and not has_audio and not duration_minutes:
         return _err("Provide a target duration when using only a still image.")
-    single_only = (
-        (len(videos) == 1 and not has_audio) or (has_audio and not has_videos and not has_image)
-    ) and not has_image
-    if single_only and not duration_minutes and not loop_count:
-        return _err("Provide target duration or loop count for a single file.")
     if len(videos) == 1 and has_audio and not loop_mode:
         return _err("Choose whether to loop video, audio, or both.")
     if stitch and len(videos) < 2:
@@ -159,6 +195,12 @@ def merge():
         "stitch": stitch,
         "keep_source_audio": keep_source_audio,
         "mute": mute,
+        "resolution": resolution,
+        "fps": fps,
+        "quality": quality,
+        "aspect": aspect,
+        "fit": fit,
+        "trims": trims,
     }
     jobs.create_job(job_id, params, output_filename)
 
@@ -178,6 +220,7 @@ def job_status(job_id: str):
         "message": job["message"],
         "filename": job["output_name"],
         "duration_seconds": job["duration_seconds"],
+        "progress": float(job["progress"] or 0) if job.get("progress") is not None else 0,
         "error": job["error"],
     }
     if job["status"] == jobs.DONE:

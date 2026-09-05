@@ -1,0 +1,13 @@
+.git
+.gitignore
+__pycache__/
+**/__pycache__/
+*.pyc
+data/
+.venv/
+venv/
+*.md
+screen.png
+code.html
+colab/*.ipynb
+.DS_Store

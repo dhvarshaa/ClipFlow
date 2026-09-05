@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-error":"#690005","on-tertiary-fixed":"#231b00","tertiary":"#ffecb9","secondary-fixed-dim":"#ddb7ff","surface-container":"#1e2023","surface-tint":"#00daf3","on-surface":"#e2e2e6","primary":"#c3f5ff","on-secondary-fixed":"#2c0051","inverse-on-surface":"#2f3034","secondary":"#ddb7ff","surface-container-lowest":"#0c0e11","secondary-container":"#6f00be","on-surface-variant":"#bac9cc","on-secondary":"#490080","outline":"#849396","tertiary-fixed-dim":"#eec200","on-tertiary-container":"#6c5700","primary-fixed-dim":"#00daf3","on-primary-fixed-variant":"#004f58","on-tertiary-fixed-variant":"#574500","surface-variant":"#333538","on-tertiary":"#3c2f00","on-primary-fixed":"#001f24","surface-dim":"#111316","surface-container-low":"#1a1c1f","error":"#ffb4ab","surface-container-highest":"#333538","tertiary-fixed":"#ffe083","tertiary-container":"#facc15","outline-variant":"#3b494c","inverse-surface":"#e2e2e6","primary-container":"#00e5ff","surface":"#111316","surface-bright":"#37393d","primary-fixed":"#9cf0ff","on-secondary-container":"#d6a9ff","on-primary-container":"#00626e","background":"#111316","secondary-fixed":"#f0dbff","on-primary":"#00363d","on-error-container":"#ffdad6","inverse-primary":"#006875","on-background":"#e2e2e6","on-secondary-fixed-variant":"#6900b3","error-container":"#93000a","surface-container-high":"#282a2d"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"spacing-xxs":"0.125rem","handle-touch-target":"2.75rem","spacing-md":"0.75rem","scrubber-head-size":"1.125rem","lane-height-audio":"2.75rem","lane-height-overlay":"2.25rem","spacing-lg":"1rem","lane-height-video":"4.25rem","spacing-xs":"0.25rem","track-padding-x":"0.5rem","spacing-xl":"1.5rem","drawer-collapsed-height":"3.5rem","playhead-width":"0.125rem","track-gutter":"0.25rem","spacing-sm":"0.5rem"},fontFamily:{"body-md":["Geist"],"headline-lg":["Space Grotesk"],"action-button":["Geist"],"display-timecode":["JetBrains Mono"],"headline-md":["Space Grotesk"],"display-timecode-mobile":["JetBrains Mono"],"label-mono-xs":["JetBrains Mono"],"label-mono-sm":["JetBrains Mono"],"body-sm":["Geist"]},fontSize:{"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"30px","letterSpacing":"-0.02em","fontWeight":"700"}],"action-button":["13px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"600"}],"display-timecode":["28px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["18px",{"lineHeight":"24px","letterSpacing":"-0.01em","fontWeight":"600"}],"display-timecode-mobile":["22px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-mono-xs":["9px",{"lineHeight":"12px","letterSpacing":"0.04em","fontWeight":"600"}],"label-mono-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}]}}}};</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-14 w-full px-spacing-md flex items-center justify-between gap-spacing-md"><div class="flex items-center gap-spacing-md flex-shrink-0"><img alt="Brand logo. - Primary color: #00e5ff
+- Font: spaceGrotesk
+- Mode: dark
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UAjbl1RAyM2YsS7R3mpAvGJsisIQY7fZNUrZxhTDEfOfAOGFibjJE4tiMBWbCdcnNP5KE0Bu_LQx7gC5EY9q-9t1b4YYNrvvFit34GfTNhEUMdDAtZxQtihA5COwp6scp2tF3gtXrGYIZwqWlvz6nHqANB0Iy7keariVOn872HeiEuomyB8xMthl5zauv6qD16hk9rNPS_XPnmdZ6BHb-AhoyAl9If56eo1BHRelhxuaSuncB4J_gJWT3m"/><span class="font-headline-md text-headline-md tracking-tight text-primary-container hidden sm:inline-block">ClipFlow<span class="text-tertiary-container font-normal text-xs ml-1 uppercase tracking-widest px-1.5 py-0.5 rounded bg-surface-container-high">PRO</span></span><div class="h-5 w-px bg-surface-variant mx-spacing-xs hidden md:block"></div><div class="flex items-center gap-spacing-xs"><span class="font-label-mono-sm text-label-mono-sm text-on-surface truncate max-w-[190px] lg:max-w-[260px]">Summer_Adventure_Vlog_4K.mp4</span><span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-mono-xs text-label-mono-xs uppercase">4K 60FPS SMPTE</span></div><div class="hidden xl:flex items-center gap-1 ml-spacing-xs"><button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Undo (Ctrl+Z)" type="button"><span class="material-symbols-outlined text-[18px]">undo</span></button><button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Redo (Ctrl+Y)" type="button"><span class="material-symbols-outlined text-[18px]">redo</span></button></div></div><nav class="hidden lg:flex items-center bg-surface-container-low p-1 rounded-xl gap-1" data-active-classes="bg-surface-container-high text-primary-container font-semibold rounded-lg shadow-inner"><a aria-current="page" class="px-spacing-md py-1.5 transition-all bg-surface-container-high text-primary-container font-semibold rounded-lg shadow-inner" data-path="timeline-editor" href="#">Timeline Editor</a><a class="px-spacing-md py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all font-action-button text-action-button" data-path="media-stitcher" href="#">Media Stitcher</a><a class="px-spacing-md py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all font-action-button text-action-button" data-path="audio-mixer" href="#">Audio Mixer</a><a class="px-spacing-md py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all font-action-button text-action-button" data-path="color-grading" href="#">Color Grading</a></nav><div class="flex items-center gap-spacing-sm flex-shrink-0"><div class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container text-on-surface-variant font-label-mono-xs text-label-mono-xs"><span class="material-symbols-outlined text-primary text-[14px]">cloud_done</span><span>SYNCED</span></div><button class="flex items-center p-1.5 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Toggle Color Theme" type="button"><span class="material-symbols-outlined text-[18px]">dark_mode</span></button><a class="flex items-center gap-1.5 px-spacing-md py-1.5 rounded-lg bg-primary-container text-on-primary font-action-button text-action-button shadow-sm hover:brightness-110 active:scale-95 transition-all" data-path="export-studio" href="#"><span class="material-symbols-outlined text-[18px]">ios_share</span><span class="hidden md:inline">Export Studio</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 ring-1 ring-primary-container/20"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-16 bg-surface-container-lowest flex flex-col items-center py-spacing-md z-40 shadow-[1px_0_8px_rgba(0,0,0,0.3)]"><div class="flex flex-col items-center gap-spacing-sm w-full px-spacing-xs"><button class="w-11 h-11 rounded-lg flex items-center justify-center text-primary-container bg-surface-container-high transition-colors" title="Selection Pointer (V)" type="button"><span class="material-symbols-outlined text-[20px]">near_me</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Razor / Blade Tool (B)" type="button"><span class="material-symbols-outlined text-[20px]">content_cut</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Ripple Edit (B)" type="button"><span class="material-symbols-outlined text-[20px]">sync_alt</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Slip Tool (Y)" type="button"><span class="material-symbols-outlined text-[20px]">swap_horiz</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Hand / Pan (H)" type="button"><span class="material-symbols-outlined text-[20px]">pan_tool</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Type Tool (T)" type="button"><span class="material-symbols-outlined text-[20px]">title</span></button></div><div class="mt-auto flex flex-col items-center gap-spacing-xs w-full px-spacing-xs"><button class="w-11 h-11 rounded-lg flex items-center justify-center text-tertiary-container hover:bg-surface-container transition-colors" title="Magnet Snapping (N)" type="button"><span class="material-symbols-outlined text-[20px]">qr_code_2</span></button><button class="w-11 h-11 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Workspace Settings" type="button"><span class="material-symbols-outlined text-[20px]">tune</span></button></div></aside><div class="pl-16 w-full"><main class="w-full pt-14 bg-background min-h-screen"><div class="flex flex-col w-full">
+<div class="flex flex-col w-full bg-background text-on-surface select-none">
+<!-- UPPER WORKSPACE: Media Bin | Program Monitor | Parametric Inspector -->
+<div class="grid grid-cols-12 gap-spacing-sm p-spacing-sm w-full h-[480px]">
+<!-- LEFT: Project Bin / Media Assets Shelf (Col 1-3) -->
+<div class="col-span-3 flex flex-col bg-surface-container-lowest rounded-xl p-spacing-sm shadow-md overflow-hidden">
+<!-- Bin Header & Search -->
+<div class="flex items-center justify-between gap-spacing-xs pb-spacing-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-container text-[18px]">folder_open</span>
+<span class="font-headline-md text-[13px] uppercase tracking-wider text-on-surface">Project Bin</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Import Asset">
+<span class="material-symbols-outlined text-[16px]">add_photo_alternate</span>
+</button>
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Sort Order">
+<span class="material-symbols-outlined text-[16px]">sort</span>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full my-spacing-xs">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-on-surface-variant text-[16px]">search</span>
+<input class="w-full pl-8 pr-2.5 py-1.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm placeholder:text-outline focus:outline-none focus:bg-surface-container transition-all" placeholder="Search clips, audio, LUTs..." type="text"/>
+</div>
+<!-- Media Tags Filter Chips -->
+<div class="flex items-center gap-1.5 py-1.5 overflow-x-auto no-scrollbar">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary-container font-label-mono-xs text-label-mono-xs whitespace-nowrap cursor-pointer">ALL (18)</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-mono-xs text-label-mono-xs whitespace-nowrap cursor-pointer">4K HDR</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-mono-xs text-label-mono-xs whitespace-nowrap cursor-pointer">B-ROLL</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-mono-xs text-label-mono-xs whitespace-nowrap cursor-pointer">AUDIO</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface font-label-mono-xs text-label-mono-xs whitespace-nowrap cursor-pointer">VO</span>
+</div>
+<!-- Media Asset Grid -->
+<div class="flex-1 grid grid-cols-2 gap-spacing-xs overflow-y-auto pr-0.5 pt-1">
+<!-- Item 1 -->
+<div class="group relative rounded-lg bg-surface-container-low overflow-hidden cursor-pointer hover:bg-surface-container transition-all shadow-sm">
+<div class="relative aspect-video w-full bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Vibrant scarlet macaw parrot with brilliant red, yellow, and deep azure blue plumage perched majestically on a mossy branch in deep rainforest canopy, cinematic 4K natural rim lighting, macro feather detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCQYyPpLAAYh3H0Aj0K0BaWmG32u36nEP0WDmzTb3IjUdhngwag-GQ1HABy6gDGjcgSl3I3dYY5Qq8l9lkj4wxjifbsKCRhoplhel7egORAOQfcmHNpMSmXRL0hbNcfsg0TdSRCAxGQWtANLGXadifob4ABqBhZvBfDa_Fgu0rRB5HATc50p_EgJ1_vnq6eT1PjhM5HsQmOLvmpKRMXMn84JOjC4o4X2oR9S1-THh3juEqYB_KLfHOCQ"/>
+<span class="absolute bottom-1 right-1 px-1 rounded bg-surface-container-lowest/90 text-on-surface font-label-mono-xs text-label-mono-xs">00:08.2</span>
+<span class="absolute top-1 left-1 px-1 rounded bg-primary-container/90 text-on-primary font-label-mono-xs text-[8px] font-bold">4K</span>
+</div>
+<div class="p-1.5 flex flex-col">
+<span class="font-label-mono-sm text-[11px] truncate text-on-surface">parrot1_perch.mp4</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant">3840x2160 · 59.94p</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group relative rounded-lg bg-surface-container-low overflow-hidden cursor-pointer hover:bg-surface-container transition-all shadow-sm">
+<div class="relative aspect-video w-full bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Blue and gold macaw spreading wide wings against a dark textured cinematic studio background, sharp feather textures, intense golden lighting highlighting the brilliant wing span." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQzxfHKGGkMvRnwo84v5dSKVQ35lexo3Hwb3hY-F-my2n7FQ35FHUqCghGFiEpik0cxAr7QOHITst38RxEBcLqutIQu0o6cCjXM6bh8eVKV5ox6Pvr0P7Lrdkq_JonM0J3CVPzH1zdYqQ4UdqcMogyCDQ9TTyi7gJnllJ81AjiSsxOC1Na2GRnMI-SdxNTxj706C8FSHwyDcAqNi_spuug4eJ5DELaj8gEIpCUmvavj_26WT3uFdsJXw"/>
+<span class="absolute bottom-1 right-1 px-1 rounded bg-surface-container-lowest/90 text-on-surface font-label-mono-xs text-label-mono-xs">00:05.6</span>
+<span class="absolute top-1 left-1 px-1 rounded bg-primary-container/90 text-on-primary font-label-mono-xs text-[8px] font-bold">4K</span>
+</div>
+<div class="p-1.5 flex flex-col">
+<span class="font-label-mono-sm text-[11px] truncate text-on-surface">parrot2_wings.mp4</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant">3840x2160 · 59.94p</span>
+</div>
+</div>
+<!-- Item 3 (Selected in Deck) -->
+<div class="group relative rounded-lg bg-surface-container-high overflow-hidden cursor-pointer shadow-sm">
+<div class="relative aspect-video w-full bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait shot of vibrant rainbow lorikeet parrot with yellow and orange chest leaning on bark in tropical Costa Rican wilderness, bokeh foliage background with natural sun flares." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuDNqdlwgcI3KVmISvaClnGvpf7sU7L4PILPiUO1_nkVeM6rks0c7A_YHcQ0F4nOM_QwU6SBE3suXxkOmx31svZOsQY3U9yd_bYuioNrnjkf-XqkEOpxoZ5aX8YqSvj3YPIRyiRtDwLyTUb6FtIepdpb9glluGkVsZ3aV0v-GA7cFHOxw3IOwETT7jyJ91uOdoqqM4_6A75mTEjBc_LBLGmTAXcSeMvlQ9FgNxkKGG-Op9hcbufLXn5w"/>
+<span class="absolute bottom-1 right-1 px-1 rounded bg-surface-container-lowest/90 text-primary-container font-label-mono-xs text-label-mono-xs">00:06.1</span>
+<div class="absolute inset-0 bg-primary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container text-[20px] drop-shadow">check_circle</span>
+</div>
+</div>
+<div class="p-1.5 flex flex-col">
+<span class="font-label-mono-sm text-[11px] truncate text-primary-container font-semibold">parrot3_close.mp4</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant">Active in timeline</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group relative rounded-lg bg-surface-container-low overflow-hidden cursor-pointer hover:bg-surface-container transition-all shadow-sm">
+<div class="relative aspect-video w-full bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Emerald green parakeet resting peacefully on a flowering blossom twig with soft red berry clusters, dappled sunlight filtering through tropical rain leaves." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8AeHQeyWagpO3Jd_YFNwI0_DsceCVcf_P7kkqouQiq-LbnTp9md4X5KtSevWKpU3G5OVTGh5_ivWoz5ndOlxRTaZNFuaS7LrqLjNW_w-ecKIBGMfJzzohlMx1TpS7i69L9L2U5scMST74Q_v-VQtE-tvM3rElZyvDqM9d1ImmTgEJ5d65KAV-MMsRKJhv9XzeiZpy_ySFIzdGlBvYb1HzaxcCrQ1JnuhNpKHwL0YRbzug7cOyVcPLvw"/>
+<span class="absolute bottom-1 right-1 px-1 rounded bg-surface-container-lowest/90 text-on-surface font-label-mono-xs text-label-mono-xs">00:07.4</span>
+</div>
+<div class="p-1.5 flex flex-col">
+<span class="font-label-mono-sm text-[11px] truncate text-on-surface">parrot4_bloom.mp4</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant">3840x2160 · 29.97p</span>
+</div>
+</div>
+</div>
+<!-- Import Dropzone Strip -->
+<div class="mt-spacing-xs p-2 rounded-lg bg-surface-container-low flex items-center justify-center gap-2 text-on-surface-variant hover:text-primary-container hover:bg-surface-container cursor-pointer transition-all">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+<span class="font-action-button text-[11px]">Drop media files to import</span>
+</div>
+</div>
+<!-- CENTER: 16:9 Program Monitor / Canvas (Col 4-9) -->
+<div class="col-span-6 flex flex-col bg-surface-container-lowest rounded-xl p-spacing-sm shadow-md overflow-hidden justify-between">
+<!-- Monitor Header Badges -->
+<div class="flex items-center justify-between px-spacing-xs pb-spacing-xs">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-primary-container font-label-mono-xs text-label-mono-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+              REC709 · HDR10
+            </span>
+<span class="text-on-surface-variant font-label-mono-xs text-label-mono-xs">SCENE 01 / TAKE 04</span>
+</div>
+<!-- Safe Title Guides & Aspect Controls -->
+<div class="flex items-center gap-1">
+<button class="px-2 py-0.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-mono-xs text-label-mono-xs" title="Aspect Ratio">
+              16:9 (100%)
+            </button>
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-primary-container transition-colors" title="Overlay Title Guides On">
+<span class="material-symbols-outlined text-[16px]">grid_4x4</span>
+</button>
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Fullscreen Monitor">
+<span class="material-symbols-outlined text-[16px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Video Canvas with Safe Action Guides -->
+<div class="relative flex-1 w-full bg-black rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+<img class="w-full h-full object-cover" data-alt="High quality frame capture of an exotic scarlet macaw parrot looking direct to camera while eating seeds on a forest vine, rich saturated crimson red and cyan feathers, sharp depth of field with misty green background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdiUqMigwfO1yhpzDm8wVZS_x1DfvR8aGlXnSmJLNxIaqvWUZZZmCfwA1p0TT93X_U-RDyz8dbw_TY2wJCZQBebqdO5oR9E96D24Oz91_w7ph2KFV1OupIAivvP9s9Y2Bwfdgw9oKU5d0ZEzzj6aDBZwv1nPsji9RYG4I55z0NyHNJ5nZKBQ5D5eMJrs-bAsSsZ_NILKDZ0puxIJdGfEnGk8mXbI6bLUv0LQ0rxde64YbTocNvvqR7Mw"/>
+<!-- Overlaid Safe Action / Title Grid -->
+<div class="absolute inset-6 pointer-events-none rounded opacity-30 flex items-center justify-center">
+<div class="w-full h-full rounded"></div>
+</div>
+<!-- Top-Center Floating Scrim Timecode Readout -->
+<div class="absolute top-3 px-3 py-1 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-primary-container font-display-timecode text-display-timecode tracking-wider shadow-lg flex items-center gap-2">
+<span class="text-[10px] text-tertiary-container font-label-mono-xs uppercase px-1 rounded bg-surface-container-high">SMPTE</span>
+<span>00:14.820</span>
+<span class="text-on-surface-variant text-[14px]">/ 00:32.400</span>
+</div>
+<!-- Live Watermark Overlay (V2 Track Simulation) -->
+<div class="absolute bottom-4 left-4 px-2.5 py-1 rounded bg-surface-container-lowest/80 backdrop-blur-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container text-[16px]">nature</span>
+<span class="font-headline-md text-[11px] text-on-surface uppercase tracking-widest">WILDLIFE BIO 4K</span>
+</div>
+</div>
+<!-- Transport & Shuttle Controls -->
+<div class="flex items-center justify-between pt-spacing-sm px-spacing-xs">
+<!-- In / Out Marks -->
+<div class="flex items-center gap-1">
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface-variant hover:text-on-surface text-label-mono-xs font-label-mono-xs" title="Mark In Point (I)">
+              IN [
+            </button>
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface-variant hover:text-on-surface text-label-mono-xs font-label-mono-xs" title="Mark Out Point (O)">
+              OUT ]
+            </button>
+<button class="p-1 rounded bg-surface-container text-on-surface-variant hover:text-on-surface" title="Clear Marks">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Primary Jog / Shuttle Buttons -->
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Step 1 Frame Back">
+<span class="material-symbols-outlined text-[18px]">skip_previous</span>
+</button>
+<button class="p-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Rewind Fast (J)">
+<span class="material-symbols-outlined text-[18px]">fast_rewind</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:brightness-110 active:scale-95 shadow-md transition-all" title="Play / Pause (Space)">
+<span class="material-symbols-outlined text-[24px]">play_arrow</span>
+</button>
+<button class="p-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Fast Forward (L)">
+<span class="material-symbols-outlined text-[18px]">fast_forward</span>
+</button>
+<button class="p-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Step 1 Frame Forward">
+<span class="material-symbols-outlined text-[18px]">skip_next</span>
+</button>
+</div>
+<!-- Playback Speed & Loop -->
+<div class="flex items-center gap-1.5">
+<button class="px-2 py-1 rounded bg-surface-container text-tertiary-container font-label-mono-xs text-label-mono-xs uppercase" title="Playback Loop Mode">
+<span class="material-symbols-outlined text-[14px] align-middle mr-0.5">repeat</span>LOOP
+            </button>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface font-label-mono-xs text-label-mono-xs">1.0x</span>
+</div>
+</div>
+</div>
+<!-- RIGHT: Clip Properties & Inspector Panel (Col 10-12) -->
+<div class="col-span-3 flex flex-col bg-surface-container-lowest rounded-xl p-spacing-sm shadow-md overflow-hidden">
+<!-- Inspector Header -->
+<div class="flex items-center justify-between pb-spacing-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary-container text-[18px]">tune</span>
+<span class="font-headline-md text-[13px] uppercase tracking-wider text-on-surface">Clip Inspector</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-primary-container font-label-mono-xs text-label-mono-xs">parrot3.mp4</span>
+</div>
+<!-- Section Tabs -->
+<div class="flex items-center bg-surface-container-low p-1 rounded-lg gap-1 my-spacing-xs">
+<button class="flex-1 py-1 text-center rounded bg-surface-container-high text-primary-container font-action-button text-action-button">Video</button>
+<button class="flex-1 py-1 text-center rounded text-on-surface-variant hover:text-on-surface font-action-button text-action-button">Audio</button>
+<button class="flex-1 py-1 text-center rounded text-on-surface-variant hover:text-on-surface font-action-button text-action-button">Speed</button>
+</div>
+<!-- Transform Parameters -->
+<div class="flex-1 overflow-y-auto space-y-3 pr-1 pt-1">
+<!-- Scale & Position -->
+<div class="p-2.5 rounded-lg bg-surface-container-low space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-[11px] text-on-surface uppercase tracking-wider">Transform</span>
+<button class="text-tertiary-container hover:brightness-125" title="Add Keyframe">
+<span class="material-symbols-outlined text-[16px]">diamond</span>
+</button>
+</div>
+<!-- Scale Slider -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-on-surface-variant font-label-mono-xs text-label-mono-xs">
+<span>Scale</span>
+<span class="text-primary-container font-semibold">100.0 %</span>
+</div>
+<div class="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[50%] h-full bg-primary-container rounded-full"></div>
+</div>
+</div>
+<!-- Position X / Y -->
+<div class="grid grid-cols-2 gap-2 pt-1">
+<div class="flex items-center justify-between px-2 py-1 rounded bg-surface-container">
+<span class="font-label-mono-xs text-on-surface-variant">X:</span>
+<span class="font-label-mono-sm text-on-surface">0.0 px</span>
+</div>
+<div class="flex items-center justify-between px-2 py-1 rounded bg-surface-container">
+<span class="font-label-mono-xs text-on-surface-variant">Y:</span>
+<span class="font-label-mono-sm text-on-surface">0.0 px</span>
+</div>
+</div>
+<!-- Rotation -->
+<div class="flex flex-col gap-1 pt-1">
+<div class="flex justify-between text-on-surface-variant font-label-mono-xs text-label-mono-xs">
+<span>Rotation</span>
+<span class="text-on-surface">0.0°</span>
+</div>
+<div class="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[0%] h-full bg-primary-container rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Compositing & Opacity -->
+<div class="p-2.5 rounded-lg bg-surface-container-low space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-[11px] text-on-surface uppercase tracking-wider">Compositing</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-on-surface-variant font-label-mono-xs text-label-mono-xs">Normal</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-on-surface-variant font-label-mono-xs text-label-mono-xs">
+<span>Opacity</span>
+<span class="text-primary-container font-semibold">100 %</span>
+</div>
+<div class="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-full h-full bg-primary-container rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Audio Gain Mini-Strip -->
+<div class="p-2.5 rounded-lg bg-surface-container-low space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-[11px] text-on-surface uppercase tracking-wider">Audio Gain</span>
+<span class="font-label-mono-xs text-tertiary-container">+0.0 dB</span>
+</div>
+<!-- Volume slider with center 0dB line -->
+<div class="relative w-full h-1.5 bg-surface-container rounded-full overflow-hidden flex items-center">
+<div class="w-[60%] h-full bg-secondary rounded-full"></div>
+</div>
+<div class="flex justify-between text-[9px] text-on-surface-variant font-label-mono-xs">
+<span>-inf</span>
+<span>-12dB</span>
+<span>0dB</span>
+<span>+6dB</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Reset / Invert -->
+<div class="pt-spacing-xs flex items-center justify-between">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface font-action-button text-[11px] transition-colors">Reset Attributes</button>
+<button class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary font-action-button text-[11px] font-semibold transition-all">Apply to All</button>
+</div>
+</div>
+</div>
+<!-- LOWER WORKSPACE: Full-Width Pro NLE Multi-Track Timeline Deck -->
+<div class="flex flex-col w-full bg-surface-container-lowest shadow-2xl p-spacing-sm">
+<!-- TIMELINE TOOLBAR STRIP -->
+<div class="flex items-center justify-between px-spacing-sm py-2 bg-surface-container-low rounded-xl mb-spacing-xs">
+<!-- Tool Selectors & Snap/Split Actions -->
+<div class="flex items-center gap-1.5">
+<button class="px-2.5 py-1.5 rounded-lg bg-surface-container-high text-tertiary-container flex items-center gap-1 font-action-button text-action-button shadow-sm" title="Magnet Snapping (N)">
+<span class="material-symbols-outlined text-[16px]">qr_code_2</span>
+<span class="text-[11px]">SNAP ON</span>
+</button>
+<div class="h-4 w-px bg-surface-variant mx-1"></div>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary-container transition-colors" title="Blade / Split Tool (B)">
+<span class="material-symbols-outlined text-[18px]">content_cut</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Ripple Trim Drag">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Add Marker (M)">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Add Transition (+)">
+<span class="material-symbols-outlined text-[18px]">auto_fix_high</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-error hover:bg-error-container/20 transition-colors" title="Delete Selected Clip">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+<!-- Center Timecode & Frame Delta Indicator -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-surface-container-lowest shadow-inner">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-ping"></span>
+<span class="font-display-timecode text-[18px] text-tertiary-container tracking-wider">00:14.820</span>
+<span class="text-on-surface-variant font-label-mono-xs text-label-mono-xs">FRAME 889</span>
+</div>
+</div>
+<!-- Zoom Slider & View Options -->
+<div class="flex items-center gap-2">
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant" title="Zoom Out">
+<span class="material-symbols-outlined text-[16px]">zoom_out</span>
+</button>
+<div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-3/5 h-full bg-primary-container rounded-full"></div>
+</div>
+<button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant" title="Zoom In">
+<span class="material-symbols-outlined text-[16px]">zoom_in</span>
+</button>
+<div class="h-4 w-px bg-surface-variant mx-1"></div>
+<div class="flex items-center gap-1 px-2 py-1 rounded bg-surface-container text-on-surface-variant text-label-mono-xs font-label-mono-xs cursor-pointer hover:bg-surface-container-high">
+<span>Options</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- MULTI-TRACK TIMELINE CANVAS -->
+<div class="relative w-full rounded-xl bg-surface-container-lowest overflow-hidden flex flex-col shadow-inner">
+<!-- SMPTE RULER STRIP WITH GOLDEN PLAYHEAD TEARDROP PIN -->
+<div class="relative h-8 w-full bg-surface-container-low flex items-center shadow-sm">
+<!-- Left Track-Headers Space Spacer (w-48) -->
+<div class="w-48 h-full flex-shrink-0 bg-surface-container flex items-center justify-between px-3">
+<span class="font-label-mono-xs text-on-surface-variant uppercase tracking-widest text-[10px]">Tracks Deck</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">layers</span>
+</div>
+<!-- Ruler Tick Marks Canvas Area -->
+<div class="relative flex-1 h-full flex items-end px-2 overflow-hidden select-none">
+<!-- Dynamic Tick Marks & Timestamps -->
+<div class="w-full flex justify-between font-label-mono-xs text-[10px] text-on-surface-variant/80 pb-1">
+<span class="flex items-center gap-1"><span class="h-2.5 w-px bg-outline-variant"></span>00:00.000</span>
+<span class="flex items-center gap-1"><span class="h-2 w-px bg-outline-variant"></span>00:05.000</span>
+<span class="flex items-center gap-1"><span class="h-2 w-px bg-outline-variant"></span>00:10.000</span>
+<span class="flex items-center gap-1 text-tertiary-container font-semibold"><span class="h-3 w-px bg-tertiary-container"></span>00:15.000</span>
+<span class="flex items-center gap-1"><span class="h-2 w-px bg-outline-variant"></span>00:20.000</span>
+<span class="flex items-center gap-1"><span class="h-2 w-px bg-outline-variant"></span>00:25.000</span>
+<span class="flex items-center gap-1"><span class="h-2.5 w-px bg-outline-variant"></span>00:30.000</span>
+</div>
+<!-- Piercing Golden Playhead Head & Needle Marker -->
+<div class="absolute left-[47%] top-0 bottom-0 flex flex-col items-center z-40 pointer-events-none">
+<!-- Golden Teardrop / Diamond Head -->
+<div class="w-3.5 h-4 bg-tertiary-container flex items-center justify-center shadow-lg clip-path-marker" style="clip-path: polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);">
+<div class="w-1 h-1 rounded-full bg-surface-container-lowest"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- TRACK LANES CONTAINER (Relative for continuous vertical playhead line) -->
+<div class="relative w-full flex flex-col">
+<!-- CONTINUOUS YELLOW PLAYHEAD LINE (Cuts through all tracks) -->
+<div class="absolute left-[calc(12rem+((100%-12rem)*0.47))] top-0 bottom-0 w-[2px] bg-tertiary-container z-30 pointer-events-none shadow-[0_0_8px_rgba(250,204,21,0.6)]"></div>
+<!-- TRACK V2: Overlay / Graphics (Picture in Picture) -->
+<div class="flex items-center w-full h-10 bg-surface-container-low/60 hover:bg-surface-container-low/80 transition-colors">
+<!-- Header Controls -->
+<div class="w-48 h-full flex-shrink-0 bg-surface-container flex items-center justify-between px-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono-xs text-primary-container font-bold">V2</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant truncate">Nature_Overlay</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="hover:text-on-surface" title="Toggle Visibility"><span class="material-symbols-outlined text-[15px]">visibility</span></button>
+<button class="hover:text-on-surface" title="Lock Track"><span class="material-symbols-outlined text-[15px]">lock_open</span></button>
+</div>
+</div>
+<!-- Clip Lane Content -->
+<div class="flex-1 h-full relative flex items-center px-2">
+<!-- Floating graphic overlay bar -->
+<div class="absolute left-[20%] w-[38%] h-7 rounded-lg bg-surface-container-high flex items-center justify-between px-2 shadow-sm">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-tertiary text-[14px]">nature</span>
+<span class="font-label-mono-xs text-[10px] text-on-surface truncate">title_card_wildlife.png</span>
+</div>
+<span class="px-1 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-mono-xs text-[9px]">Opacity 85%</span>
+</div>
+</div>
+</div>
+<!-- TRACK V1: Core Video Filmstrip Track (Visual center modeled after user reference) -->
+<div class="flex items-center w-full h-[72px] bg-surface-container-lowest">
+<!-- V1 Header Controls -->
+<div class="w-48 h-full flex-shrink-0 bg-surface-container flex items-center justify-between px-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono-xs text-primary-container font-bold text-[13px]">V1</span>
+<span class="font-body-sm text-[11px] text-on-surface font-medium truncate">Primary 4K Reel</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="hover:text-primary-container" title="Visible"><span class="material-symbols-outlined text-[15px]">visibility</span></button>
+<button class="hover:text-on-surface" title="Track Locked"><span class="material-symbols-outlined text-[15px]">lock</span></button>
+</div>
+</div>
+<!-- V1 Filmstrip Clip Strip with Consecutive Clips & Inline (+) Transition Seams -->
+<div class="flex-1 h-full relative flex items-center px-1 overflow-hidden">
+<div class="flex items-center w-full h-[64px] gap-1">
+<!-- Clip 1: parrot2.webp -->
+<div class="relative h-full flex-[1.2] rounded-lg bg-surface-container-low overflow-hidden group shadow-sm flex flex-col justify-between p-1">
+<!-- Checkerboard underlay for video -->
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-1 z-10">
+<img class="w-12 h-8 object-cover rounded shadow-sm" data-alt="Close up crop of scarlet macaw head with intense gaze in lush green vegetation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjYDrxp8Fhu0g6ZezmFJfdw8IaOe8ImTgUbXltO4pg8PImurzf1TjFvcF7YmeFZuQr9wGlvmwVQd1q_cKgyBibIPSKKyFTfEujeds5fnRBBxYdezkskDxd9OoSeyadsfP86N9YN5awFXi0JYVbKMVgZC8IPyyGoWzJx5krh7tdcbshpA8Yd9YAn2rI3947bg2_3Vhrg0X-WtuWwJywEY3JGgLCH8tDvvHkhQ2NPQs9woX5aX0HXpqLXw"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[10px] text-on-surface font-semibold truncate">parrot2.webp</span>
+<span class="font-label-mono-xs text-[8px] text-on-surface-variant">00:00 - 00:04</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+<!-- Seam Connector 1 (+) -->
+<button class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface-variant flex items-center justify-center flex-shrink-0 shadow transition-all z-10" title="Add Crossfade / Dissolve Transition">
+<span class="material-symbols-outlined text-[13px]">add</span>
+</button>
+<!-- Clip 2: parrot3.webp -->
+<div class="relative h-full flex-[1.4] rounded-lg bg-surface-container-low overflow-hidden group shadow-sm flex flex-col justify-between p-1">
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-1 z-10">
+<img class="w-12 h-8 object-cover rounded shadow-sm" data-alt="Blue and yellow macaw parrot opening yellow wings against studio dark backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChFA71xv-JeOvwDJ9F1H6shHTIliuuQAZEs4ZzZb9IVj6IgOf-syAEBKUHUDa5VXO3DsIdfWOAya91bcBTf5HPQ5yu2xdKtnIN2CaK3jwdMnjkvvP8IcfvvGSQB2TDJTrOeZSlf7m8IW8T4AooUE-yeRlgW9ryeMWxxRQDpLY1XlKVilUi-jRlL-Fp_Yg3u8L3Sb0-Xji3sgclon8IuHHSVz2MHjjd0IYIBau0cEEu-1Ut1C2maMi2TA"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[10px] text-on-surface font-semibold truncate">parrot3.webp</span>
+<span class="font-label-mono-xs text-[8px] text-on-surface-variant">00:04 - 00:09</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+<!-- Seam Connector 2 (+) -->
+<button class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface-variant flex items-center justify-center flex-shrink-0 shadow transition-all z-10" title="Add Transition">
+<span class="material-symbols-outlined text-[13px]">add</span>
+</button>
+<!-- Clip 3: parrot4.webp -->
+<div class="relative h-full flex-[1.1] rounded-lg bg-surface-container-low overflow-hidden group shadow-sm flex flex-col justify-between p-1">
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-1 z-10">
+<img class="w-12 h-8 object-cover rounded shadow-sm" data-alt="Pair of vibrant rainbow lorikeet parrots perched close on tree log." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJkmW1dQ1L_Po7AFOyRbQowAFOCYcc8FK76hFPDCL3wIhEwx82JGqZDEdM_kVjsXy_ZgNCDgBIwkR8W5HciGc2WPatKmObV5lyrKcJuQHssJw_K3Q7t_l_QTmQCEw-k6g5Mx61MBS72LDhd-PFB_3tQ0NO2VLWmZAUTS1oAJIdh6C3UZAsjVnPOcIGdnlevIUAdPxP_l-Tna-ora6Bx_X0OVL8vdYgdZnPzVLDfie-hCMNEPDOJjcFCQ"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[10px] text-on-surface font-semibold truncate">parrot4.webp</span>
+<span class="font-label-mono-xs text-[8px] text-on-surface-variant">00:09 - 00:13</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+<!-- Seam Connector 3 (+) -->
+<button class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface-variant flex items-center justify-center flex-shrink-0 shadow transition-all z-10" title="Add Transition">
+<span class="material-symbols-outlined text-[13px]">add</span>
+</button>
+<!-- ACTIVE SELECTED CLIP: parrot5.webp (Highlighted Cyan Border with Dual Trimming Grip Handles) -->
+<div class="relative h-full flex-[1.6] rounded-lg bg-surface-container-low overflow-hidden shadow-lg flex flex-col justify-between p-1 ring-2 ring-primary-container z-20">
+<!-- Left Drag Hit Handle with Grip Dots -->
+<div class="absolute left-0 top-0 bottom-0 w-3 bg-primary-container/80 flex items-center justify-center cursor-ew-resize hover:bg-primary-container transition-colors z-20" title="Drag Left Trim Handle">
+<span class="material-symbols-outlined text-[12px] text-on-primary">drag_indicator</span>
+</div>
+<!-- Checkerboard Canvas & Video Thumbnail -->
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-2 pl-3 z-10">
+<img class="w-14 h-8 object-cover rounded shadow" data-alt="Red scarlet macaw parrot biting on branch in sunlight, close portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPSmzi05PD-s8d8usxJ_qPvQH5zIo8FmjrHaaNHsSeUyoKmVltRBJeB2xY-pZJ4fIuUKq3Av-GEgQ3T7EsHrlevE1sOCTeYiqgLsdAW5Hl8TOHnmMnmn79nYUAHIA4-PfleV2BqwDRNoXqayUN_GttNwZvFdmFw0TgVKV6Zv9hYrYz_ntEwQlM1rBep2-nLlW1NvoT049Z0FMyh-cbXJ0GJLyZA1UaR0YA2vu47KYObWjsrYo4qh5vnA"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[11px] text-primary-container font-bold truncate">parrot5.webp</span>
+<span class="font-label-mono-xs text-[9px] text-on-surface">TRIM: 00:04.280</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1.5 text-on-surface-variant pl-3 z-10">
+<span class="material-symbols-outlined text-primary-container text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock_open</span>
+<span class="px-1 py-0.2 rounded bg-primary-container text-on-primary font-label-mono-xs text-[8px] font-bold">ACTIVE</span>
+</div>
+<!-- Right Drag Hit Handle with Grip Dots -->
+<div class="absolute right-0 top-0 bottom-0 w-3 bg-primary-container/80 flex items-center justify-center cursor-ew-resize hover:bg-primary-container transition-colors z-20" title="Drag Right Trim Handle">
+<span class="material-symbols-outlined text-[12px] text-on-primary">drag_indicator</span>
+</div>
+</div>
+<!-- Seam Connector 4 (+) -->
+<button class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface-variant flex items-center justify-center flex-shrink-0 shadow transition-all z-10" title="Add Transition">
+<span class="material-symbols-outlined text-[13px]">add</span>
+</button>
+<!-- Clip 5: parrot1.webp -->
+<div class="relative h-full flex-[1.3] rounded-lg bg-surface-container-low overflow-hidden group shadow-sm flex flex-col justify-between p-1">
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-1 z-10">
+<img class="w-12 h-8 object-cover rounded shadow-sm" data-alt="Blue and yellow macaw parrot sitting profile against rain forest greenery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2BlMViXR9R7twhQ9vX41A6yfH60kxA9lXRBuku6vnZouBjV7MlFkZugBpphMtF5Vpv9dnr_xazpC9RhF9yJj4b8rKOvpVtaXGrget16i8gb1Qr7FO__F4S9pY6jl7y_MQtsBx81vHuaG5x8E3JKDaM_0kO34TXQ4JTsxDmPAuzhcsWMRWTw0249ESTKyxB-63_1rhrh2hMMo-4o2nFIoH9KHz31ybqYScYdPNIMRRA6EP6IMcqv3TqQ"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[10px] text-on-surface font-semibold truncate">parrot1.webp</span>
+<span class="font-label-mono-xs text-[8px] text-on-surface-variant">00:18 - 00:23</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+<!-- Seam Connector 5 (+) -->
+<button class="w-5 h-5 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface-variant flex items-center justify-center flex-shrink-0 shadow transition-all z-10" title="Add Transition">
+<span class="material-symbols-outlined text-[13px]">add</span>
+</button>
+<!-- Clip 6: parrot6.webp -->
+<div class="relative h-full flex-[1.2] rounded-lg bg-surface-container-low overflow-hidden group shadow-sm flex flex-col justify-between p-1">
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#333538_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative flex items-center gap-1 z-10">
+<img class="w-12 h-8 object-cover rounded shadow-sm" data-alt="Green parakeet resting on botanical red berries branch." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH0wVv2PsgnByWzA32wUGQ2JlHPvDJNinfphnvd38aWJn_AEuZ39gRUYQd8VQ3hQGFCTOQFxuW3QvMo8TzkqIglVPuQQWc7E7nrFn6QqKyoJee0IQJJmGCSYRa2kgSM-NjBmFUkk0DQk-TGkFRaqhcLzzuPNXSbrvovGvYUdVQDu6OZXpNMSDzOJ_Rk309XUhXzoYPVwEjmT1_n7tPi8LlmCKoX5tlkNr8vh6YgwRMQ9OmSqyd8b8mRw"/>
+<div class="flex flex-col">
+<span class="font-label-mono-xs text-[10px] text-on-surface font-semibold truncate">parrot6.webp</span>
+<span class="font-label-mono-xs text-[8px] text-on-surface-variant">00:24 - 00:30</span>
+</div>
+</div>
+<div class="relative flex items-center gap-1 text-on-surface-variant z-10">
+<span class="material-symbols-outlined text-[12px]">visibility</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TRACK A1: High-Contrast Electric Purple Audio Waveform (Directly matching reference image) -->
+<div class="flex items-center w-full h-[52px] bg-surface-container-lowest">
+<!-- A1 Header Controls -->
+<div class="w-48 h-full flex-shrink-0 bg-surface-container flex items-center justify-between px-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono-xs text-secondary font-bold text-[13px]">A1</span>
+<span class="font-body-sm text-[11px] text-on-surface font-medium truncate">audio.mp3</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="px-1 py-0.5 rounded text-[10px] font-label-mono-xs bg-surface-container-high hover:text-on-surface" title="Solo Audio">S</button>
+<button class="px-1 py-0.5 rounded text-[10px] font-label-mono-xs bg-surface-container-high text-primary-container" title="Mute Track">M</button>
+<button class="hover:text-on-surface" title="Lock"><span class="material-symbols-outlined text-[14px]">lock</span></button>
+</div>
+</div>
+<!-- Purple Waveform Lane Body -->
+<div class="flex-1 h-full relative flex items-center px-1">
+<div class="relative w-full h-[44px] rounded-lg overflow-hidden bg-[#9333ea] flex flex-col justify-between p-1 shadow-md">
+<!-- Zero dB Reference Midline Guide -->
+<div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-white/20 pointer-events-none z-10 border-dashed"></div>
+<!-- High Resolution SVG Audio Waveform Peaks -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<svg class="w-full h-full text-white/90" fill="currentColor" preserveaspectratio="none" viewbox="0 0 900 60">
+<!-- Dynamic synthesized waveform profile replicating high energy audio track -->
+<path d="M0,30 L10,25 L15,18 L20,38 L25,12 L30,46 L35,22 L40,36 L45,15 L50,42 L55,20 L60,40 L65,10 L70,50 L75,28 L80,32 L85,8 L90,52 L95,26 L100,34 L105,16 L110,44 L115,22 L120,38 L125,10 L130,50 L135,18 L140,42 L145,24 L150,36 L155,14 L160,46 L165,20 L170,40 L175,12 L180,48 L185,26 L190,34 L195,16 L200,44 L205,22 L210,38 L215,8 L220,52 L225,18 L230,42 L235,24 L240,36 L245,10 L250,50 L255,20 L260,40 L265,14 L270,46 L275,26 L280,34 L285,16 L290,44 L295,22 L300,38 L305,12 L310,48 L315,18 L320,42 L325,24 L330,36 L335,8 L340,52 L345,20 L350,40 L355,14 L360,46 L365,26 L370,34 L375,16 L380,44 L385,22 L390,38 L395,10 L400,50 L405,18 L410,42 L415,24 L420,36 L425,12 L430,48 L435,20 L440,40 L445,14 L450,46 L455,26 L460,34 L465,16 L470,44 L475,22 L480,38 L485,8 L490,52 L495,18 L500,42 L505,24 L510,36 L515,10 L520,50 L525,20 L530,40 L535,14 L540,46 L545,26 L550,34 L555,16 L560,44 L565,22 L570,38 L575,12 L580,48 L585,18 L590,42 L595,24 L600,36 L605,8 L610,52 L615,20 L620,40 L625,14 L630,46 L635,26 L640,34 L645,16 L650,44 L655,22 L660,38 L665,10 L670,50 L675,18 L680,42 L685,24 L690,36 L695,12 L700,48 L705,20 L710,40 L715,14 L720,46 L725,26 L730,34 L735,16 L740,44 L745,22 L750,38 L755,8 L760,52 L765,18 L770,42 L775,24 L780,36 L785,10 L790,50 L795,20 L800,40 L805,14 L810,46 L815,26 L820,34 L825,16 L830,44 L835,22 L840,38 L845,12 L850,48 L855,18 L860,42 L865,24 L870,36 L875,14 L880,46 L885,22 L890,38 L900,30 Z"></path>
+</svg>
+</div>
+<!-- Waveform Clip Label & Meta -->
+<div class="relative z-10 flex items-center justify-between">
+<div class="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-black/40 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[13px] text-white">audiotrack</span>
+<span class="font-label-mono-xs text-[10px] text-white font-semibold">ambient_rainforest_bg.mp3</span>
+</div>
+<span class="font-label-mono-xs text-[9px] text-white/90 bg-black/30 px-1 rounded">STEREO 48kHz · -14 LUFS</span>
+</div>
+<!-- Bottom Status Indicator -->
+<div class="relative z-10 flex items-center gap-1 text-white/80">
+<span class="material-symbols-outlined text-[11px]">graphic_eq</span>
+<span class="font-label-mono-xs text-[8px]">00:00.000 - 00:32.400</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TRACK A2: Voiceover / Narration Track with Keyframe Curve -->
+<div class="flex items-center w-full h-11 bg-surface-container-low/70">
+<!-- A2 Header Controls -->
+<div class="w-48 h-full flex-shrink-0 bg-surface-container flex items-center justify-between px-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono-xs text-primary font-bold">A2</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant truncate">VO_CostaRica_take2</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="px-1 py-0.5 rounded text-[10px] font-label-mono-xs bg-surface-container-high hover:text-on-surface">S</button>
+<button class="px-1 py-0.5 rounded text-[10px] font-label-mono-xs bg-surface-container-high hover:text-on-surface">M</button>
+<button class="hover:text-on-surface"><span class="material-symbols-outlined text-[14px]">lock_open</span></button>
+</div>
+</div>
+<!-- A2 Audio Waveform Strip with Rubber-band Keyframe Volume Envelope -->
+<div class="flex-1 h-full relative flex items-center px-1">
+<div class="relative left-[15%] w-[65%] h-[32px] rounded-lg bg-surface-container-high overflow-hidden flex items-center px-2 shadow-sm">
+<!-- Secondary Audio Waveform SVG -->
+<svg class="w-full h-full text-primary/70" fill="currentColor" preserveaspectratio="none" viewbox="0 0 500 40">
+<path d="M0,20 L15,16 L30,24 L45,12 L60,28 L75,8 L90,32 L105,18 L120,22 L135,10 L150,30 L165,15 L180,25 L195,12 L210,28 L225,8 L240,32 L255,16 L270,24 L285,10 L300,30 L315,14 L330,26 L345,12 L360,28 L375,10 L390,30 L405,16 L420,24 L435,8 L450,32 L465,15 L480,25 L500,20 Z"></path>
+</svg>
+<!-- Voiceover Clip Label -->
+<div class="absolute left-2 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[13px]">mic</span>
+<span class="font-label-mono-xs text-[10px] text-on-surface font-medium">VO_Host_Narrative.wav</span>
+</div>
+<!-- Diamond Keyframe Automation Nodes -->
+<div class="absolute left-[30%] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-tertiary-container border border-surface-container-lowest shadow" title="Gain Keyframe (+1.2dB)"></div>
+<div class="absolute left-[58%] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-tertiary-container border border-surface-container-lowest shadow" title="Gain Keyframe (0.0dB)"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM DOCKED QUICK-EDIT COMMAND SHELF -->
+<div class="flex items-center justify-between pt-spacing-sm px-spacing-xs">
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-action-button text-[12px] transition-colors">
+<span class="material-symbols-outlined text-primary-container text-[16px]">csv</span>
+<span>Split At Playhead (C)</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-action-button text-[12px] transition-colors">
+<span class="material-symbols-outlined text-tertiary-container text-[16px]">expand</span>
+<span>Trim Active Edge</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-action-button text-[12px] transition-colors">
+<span class="material-symbols-outlined text-secondary text-[16px]">graphic_eq</span>
+<span>Auto Audio Ducking</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-action-button text-[12px] transition-colors">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span>Link A/V Clips</span>
+</button>
+</div>
+<div class="flex items-center gap-2 font-label-mono-xs text-label-mono-xs text-on-surface-variant">
+<span class="px-2 py-1 rounded bg-surface-container">PROJECT: 23.976 FPS</span>
+<span class="px-2 py-1 rounded bg-surface-container">SMPTE TIMECODE DROP-FRAME</span>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface" title="Timeline Full Height">
+<span class="material-symbols-outlined text-[16px]">vertical_align_center</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>
